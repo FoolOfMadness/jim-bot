@@ -1,0 +1,25 @@
+{
+  "name": "oinker-bot",
+  "version": "0.0.1",
+  "description": "A Discord bot for a certain space cat.",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "node deploy-commands.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "frost_bunny",
+  "license": "ISC",
+  "dependencies": {
+    "canvas-gif": "^1.0.3",
+    "discord.js": "^14.16.1",
+    "dotenv": "^16.4.5",
+    "gifencoder": "^2.0.1",
+    "number-to-words": "^1.2.4",
+    "prompt-sync": "^4.2.0",
+    "require": "^0.4.4",
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
+    "yargs": "^17.7.2"
+  }
+}
