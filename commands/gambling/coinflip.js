@@ -31,7 +31,7 @@ const execute = async (interaction) => {
     if (quantity <= 0 || quantity > 100) {
       await interaction.reply({
         content:
-          'Please enter a valid number of coins to flip between 1 and 100! <:nyaAngry:1251302942456414218>',
+          'Please enter a valid number of coins to flip between 1 and 100!',
         ephemeral: true,
       });
       return;
@@ -69,19 +69,19 @@ const execute = async (interaction) => {
     if (quantity === 1) {
       //win-loss for a single flip
       if (wins === 1) {
-        resultMessage = `${playerName} **won**! <:nyaPog:1266689433755717752>`;
+        resultMessage = `${playerName} **won**!`;
       } else {
-        resultMessage = `${playerName} **lost**. <:nyaTBH:1255183972799877170>`;
+        resultMessage = `${playerName} **lost**.`;
       }
     } else {
       if (wins === quantity) {
-        resultMessage = `Nyo way! **All** **__${quantity}__** flips matched ${playerName}'s bet! <:nyaGains:1286756910435143770>`;
+        resultMessage = `Nyo way! **All** **__${quantity}__** flips matched ${playerName}'s bet!`;
       } else if (wins === 1) {
-        resultMessage = `${playerName} won **__only once!__** <:nyaPaws:1259377908229738578>`;
+        resultMessage = `${playerName} won **__only once!__**`;
       } else if (wins > 1) {
-        resultMessage = `${playerName} won **${wins}** times! <:nyaPog:1266689433755717752>`;
+        resultMessage = `${playerName} won **${wins}** times!`;
       } else {
-        resultMessage = `${playerName} **lost** **__all__** flips... Maybe this is a sign? <:nyaBinky:1260736866294956102>`;
+        resultMessage = `${playerName} **lost** **__all__** flips... Maybe this is a sign?`;
       }
     }
 
@@ -97,7 +97,7 @@ const execute = async (interaction) => {
       )
       .addFields(
         {
-          name: 'Flips <:nyaFlipoff:1278021063195885609>',
+          name: 'Flips',
           value: `• **Heads:** ${headsCount}\n• **Tails:** ${tailsCount}`,
           inline: true,
         },
@@ -113,8 +113,7 @@ const execute = async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while flipping... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while flipping...',
       ephemeral: true,
     });
   }

@@ -156,19 +156,17 @@ const execute = async (interaction) => {
     //validate timezone, date, & time
     if (!moment.tz.zone(timezone)) {
       return interaction.reply({
-        content: 'Invalid timezone! <:nyaAngry:1251302942456414218>',
+        content: 'Invalid timezone!',
         ephemeral: true,
       });
     } else if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
       return interaction.reply({
-        content:
-          'Invalid date format. Please use YYYY-MM-DD for date! <:nyaAngry:1251302942456414218>',
+        content: 'Invalid date format. Please use YYYY-MM-DD for date!',
         ephemeral: true,
       });
     } else if (!moment(time, 'HH:mm', true).isValid()) {
       return interaction.reply({
-        content:
-          'Invalid time format. Please use HH:mm for time! <:nyaAngry:1251302942456414218>',
+        content: 'Invalid time format. Please use HH:mm for time!',
         ephemeral: true,
       });
     }
@@ -206,8 +204,7 @@ const execute = async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while converting the time... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while converting the time...',
       ephemeral: true,
     });
   }

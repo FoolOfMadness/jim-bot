@@ -13,7 +13,7 @@ const { chooseWithProbabilities } = require('../../randomUtil.js');
 //name of slash commands, subcommands, & descriptions
 const data = new SlashCommandBuilder()
   .setName('punish')
-  .setDescription('Force a disobedient astronyaut to apologize properly.')
+  .setDescription('Punish a disobedient buddy.')
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addSubcommand((subcommand) =>
     subcommand
@@ -89,15 +89,15 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
   const gomens = [
     [
       'Gomenasorry ojousama supreme commander cult leader hime princess nya nya',
-      'use the buttons below to type out the full gomenasorry message. Good luck! <:nyaSalute:1251618350736478270>',
+      'use the buttons below to type out the full gomenasorry message. Good luck!',
     ],
     [
       'Gomenyasorry ojousama supreme commyander cult leader himye princyess nya nya',
-      'use the buttons below to type out the full gome*NYA*sorry message. This is a rare variant! Good luck! <:nyaSalute:1251618350736478270>',
+      'use the buttons below to type out the full gome*NYA*sorry message. This is a rare variant! Good luck!',
     ],
     [
       'sowwy Commyandew, I am simpwy too stupid of a degenyewate t-to undewstand youw shawp wits and amazing tawents!!11',
-      'use the buttons below to type out the UWUfied gomenasorry message. This is an ultra rare variant! Good luck! <:nyaSalute:1251618350736478270>',
+      'use the buttons below to type out the UWUfied gomenasorry message. This is an ultra rare variant! Good luck!',
     ],
   ];
 
@@ -318,7 +318,7 @@ const execute = async (interaction) => {
     //check if can timeout user
     if (!target.manageable || !target.moderatable) {
       await interaction.editReply(
-        "I don't have permission to timeout this user <:nyaSad:1250106743514599435>"
+        "I don't have permission to timeout this user"
       );
       return;
     }
@@ -376,9 +376,7 @@ const execute = async (interaction) => {
       timeout_duration,
       timeInSeconds
     );
-    await interaction.editReply(
-      '<:nyaSalute:1251618350736478270> yes supreme commyander princess hime nya nya'
-    );
+    await interaction.editReply('Firing Destroy Beam!');
   }
 };
 

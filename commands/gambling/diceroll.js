@@ -45,8 +45,7 @@ const execute = async (interaction) => {
     //check for valid numbers, must be at least 3 sided with max of 100 sides
     if (sides < 3 || sides > 100) {
       await interaction.reply({
-        content:
-          'Please enter a valid number of sides between 3 and 100! <:nyaAngry:1251302942456414218>',
+        content: 'Please enter a valid number of sides between 3 and 100!',
         ephemeral: true,
       });
       return;
@@ -55,8 +54,7 @@ const execute = async (interaction) => {
     //must be more than 0 & less than 100 dice
     if (quantity <= 0 || quantity > 100) {
       await interaction.reply({
-        content:
-          'Please enter a valid number of dice between 1 and 100! <:nyaAngry:1251302942456414218>',
+        content: 'Please enter a valid number of dice between 1 and 100!',
         ephemeral: true,
       });
       return;
@@ -65,8 +63,7 @@ const execute = async (interaction) => {
     //modifier must be between -50 and +50
     if (modifier < -50 || modifier > 50) {
       await interaction.reply({
-        content:
-          'Please enter a modifier between -50 and +50! <:nyaAngry:1251302942456414218>',
+        content: 'Please enter a modifier between -50 and +50!',
         ephemeral: true,
       });
       return;
@@ -140,9 +137,9 @@ const execute = async (interaction) => {
         return modes.length === results.length ? 'No mode' : modes.join(', ');
       })();
 
-      //append nyaNerd stats to the embed
+      //append nerd stats to the embed
       embed.addFields({
-        name: 'Overall Results <:nyaNerd:1251606395523039303>',
+        name: 'Overall Results',
         value: `Mean: ${mean}, Median: ${median}, Mode: ${mode}, Sum: ${sum}`,
         inline: true,
       });
@@ -153,8 +150,7 @@ const execute = async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while rolling the dice... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while rolling the dice...',
       ephemeral: true,
     });
   }

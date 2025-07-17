@@ -6,17 +6,16 @@ const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 const data = new SlashCommandBuilder()
   .setName('truth')
   .setDescription('Speak your truth.')
-  .addStringOption(option =>
-    option.setName('truth')
-      .setDescription('Your truth.')
-      .setRequired(true)
+  .addStringOption((option) =>
+    option.setName('truth').setDescription('Your truth.').setRequired(true)
   )
-  .addStringOption(option =>
-    option.setName('color')
+  .addStringOption((option) =>
+    option
+      .setName('color')
       .setDescription('Choose your text color (red or blue).')
       .addChoices(
         { name: 'red', value: 'red' },
-        { name: 'blue', value: '#0ac2ff' },
+        { name: 'blue', value: '#0ac2ff' }
       )
       .setRequired(false)
   );
@@ -37,7 +36,9 @@ const execute = async (interaction) => {
     ctx.drawImage(bgImage, 0, 0);
 
     // format text
-    let formattedText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
+    let formattedText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(
+      1
+    )}`;
     if (!/[.!?]$/.test(formattedText)) {
       formattedText += '.';
     }
@@ -62,11 +63,11 @@ const execute = async (interaction) => {
     ctx.font = '20px Courier New';
 
     // draw each character with specific colors
-    let x = 50; 
-    let y = 45; 
+    let x = 50;
+    let y = 45;
     const lineHeight = 30;
 
-    linesToDraw.forEach(line => {
+    linesToDraw.forEach((line) => {
       for (const char of line) {
         ctx.fillStyle = /[.,!?;:"“”]/.test(char) ? 'white' : chosenColor;
         ctx.fillText(char, x, y);
@@ -84,11 +85,10 @@ const execute = async (interaction) => {
       content: `${interaction.member}:`,
       files: [attachment],
     });
-
   } catch (error) {
     console.error(error);
     return interaction.followUp({
-      content: 'Something went wrong, whoops. <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong, whoops.',
       ephemeral: true,
     });
   }

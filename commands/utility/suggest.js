@@ -62,15 +62,13 @@ const execute = async (interaction) => {
 
     //reply to the user
     await interaction.reply({
-      content:
-        'Your suggestion has been sent successfully! <:nyaSalute:1251618350736478270>',
+      content: 'Your suggestion has been sent successfully!',
       ephemeral: true,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while sending your suggestion... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while sending your suggestion...',
       ephemeral: true,
     });
   }

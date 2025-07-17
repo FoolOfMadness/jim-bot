@@ -38,8 +38,7 @@ const execute = async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while processing the message... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while processing the message...',
       ephemeral: true,
     });
   }

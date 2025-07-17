@@ -68,7 +68,7 @@ const execute = async (interaction) => {
       } else {
         console.error(error);
         return interaction.followUp({
-          content: 'Something went wrong. <:nyaSad:1250106743514599435>',
+          content: 'Something went wrong.',
           ephemeral: true,
         });
       }
@@ -92,7 +92,7 @@ const execute = async (interaction) => {
     } catch (error) {
       console.error(error);
       return interaction.followUp({
-        content: 'Something went wrong... <:nyaSad:1250106743514599435>',
+        content: 'Something went wrong...',
         ephemeral: true,
       });
     }

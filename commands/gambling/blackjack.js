@@ -74,7 +74,7 @@ const handValue = (hand) => {
 
 //start the game
 const execute = async (interaction) => {
-  await interaction.reply('Game is starting right nyaow!');
+  await interaction.reply('Game is starting right now!');
 
   //declare variables
   let deck = shuffleDeck(createDeck());
@@ -156,8 +156,7 @@ const execute = async (interaction) => {
         // this happens when we don't receive an interaction within the time limit
         await message.edit({ components: [] }); // removes the buttons
         return interaction.followUp({
-          content:
-            'You ran out of time to play! <:nyaAngry:1251302942456414218>',
+          content: 'You ran out of time to play!',
           ephemeral: true,
         }); // exit command here
       }
@@ -215,20 +214,14 @@ const execute = async (interaction) => {
 
       //determine outcome logic
       if (handValue(jimHand) > 21) {
-        await interaction.followUp(
-          `${dealerName} busts! <:derplei:1254435482108956782> ${playerName} wins! <:nyaAngry:1251302942456414218>`
-        );
+        await interaction.followUp(`${dealerName} busts! ${playerName} wins!`);
       } else if (handValue(jimHand) > handValue(playerHand)) {
-        await interaction.followUp(
-          `${dealerName} wins! <:smuglei:1271465346439708742>`
-        );
+        await interaction.followUp(`${dealerName} wins!`);
       } else if (handValue(jimHand) < handValue(playerHand)) {
-        await interaction.followUp(
-          `${playerName} wins! <:nyaOver:1285789027701886986>`
-        );
+        await interaction.followUp(`${playerName} wins!`);
       } else {
         await interaction.followUp(
-          `It's a draw! ${dealerName} wins by default. <:nyaSmug:1251617158056640653>`
+          `It's a draw! ${dealerName} wins by default.`
         );
       }
       gameOver = true;

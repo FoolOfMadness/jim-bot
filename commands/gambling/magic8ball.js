@@ -18,7 +18,6 @@ const responses = [
   'No!',
   'Maybe? Maybe not...?',
   "I don't know!!",
-  "Can you repeat the question? I can't hear you",
   "You're not the boss of me!!",
   'Sure.',
   'As I see it, yes.',
@@ -35,18 +34,14 @@ const responses = [
   'My sources say no.',
   'Outlook not so good.',
   'Very doubtful.',
-  "It's nyaover.",
+  "It's over.",
   'It could work, who knows.',
   'Congratulations!',
   'Stop shaking me!',
-  "I'm sorry, but I cannot fulfill this request as it goes against LorelAI use policy.",
   'Look behind you.',
   "OMG that's crazy!",
-  'All signs point to skibidi.',
   'Okay buddy.',
   "I don't think so pal.",
-  'CORN DOGS!',
-  'Uppies for you!',
 ];
 
 //ask the 8ball
@@ -63,17 +58,14 @@ const execute = async (interaction) => {
       .setColor('Purple')
       .setTitle('Magic 8-Ball')
       .setThumbnail(interaction.member.displayAvatarURL())
-      .setDescription(
-        `🎱 **Question:** ${question}\n<:baldlei:1254809135480832070> **Answer:** ${response}`
-      );
+      .setDescription(`🎱 **Question:** ${question}\n **Answer:** ${response}`);
 
     //send the response
     await interaction.reply({ embeds: [embed] });
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content:
-        'Something went wrong while consulting the Magic 8-Ball... <:nyaSad:1250106743514599435>',
+      content: 'Something went wrong while consulting the Magic 8-Ball...',
       ephemeral: true,
     });
   }

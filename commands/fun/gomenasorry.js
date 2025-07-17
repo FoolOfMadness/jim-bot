@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require('discord.js');
 //name of slash command, description, &  variants
 const data = new SlashCommandBuilder()
   .setName('gomenasorry')
-  .setDescription('Apologizes properly.')
+  .setDescription('Apologises properly.')
   .addStringOption((option) =>
     option
       .setName('variant')
