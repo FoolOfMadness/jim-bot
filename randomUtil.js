@@ -15,21 +15,3 @@ const chooseWithProbabilities = (array, intervals) => {
 };
 
 module.exports = { chooseWithProbabilities };
-
-// let test = ['gomenasorry', 'gomenyasorry', 'sowwy'];
-
-// const results = [];
-
-// for (let i = 0; i < 1000; i++) {
-//   const result = choose(test, [
-//     [1, 80],
-//     [81, 90],
-//     [91, 100],
-//   ]);
-//   results.push(result);
-// }
-
-// const occurrences = results.reduce((acc, curr) => {
-//   return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;
-// }, {});
-// console.log(occurrences);

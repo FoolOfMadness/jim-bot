@@ -25,7 +25,10 @@ const data = new SlashCommandBuilder()
 
 const execute = async (interaction) => {
   if (interaction.user.id != '178887072864665600') {
-    await interaction.reply({ content: "You're not my dad!", ephemeral: true });
+    await interaction.reply({
+      content: "You're not him. You will never be him.",
+      ephemeral: true,
+    });
   }
 
   await interaction.deferReply({ ephemeral: true });

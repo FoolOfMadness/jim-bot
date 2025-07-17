@@ -10,7 +10,6 @@ const {
 
 const TOKEN = process.env.TOKEN;
 const DEBUG = process.env.DEBUG === 'true' ? true : false;
-const DB_PASS = process.env.DB_PASS;
 
 const client = new Client({
   intents: [
@@ -19,7 +18,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
   presence: {
-    activities: [{ name: 'you sleep', type: ActivityType.Watching }],
+    activities: [{ name: '/help', type: ActivityType.Listening }],
   },
 });
 

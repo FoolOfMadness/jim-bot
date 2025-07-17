@@ -11,24 +11,24 @@ let guildId;
 let deploymentMessage;
 if (argv.deploy) {
   guildId = process.env.MAIN_GUILD_ID;
-  deploymentMessage = 'Deploying to the Space Cat Server';
+  deploymentMessage = "Deploying to Jim's server";
 } else {
   guildId = process.env.DEV_GUILD_ID;
   deploymentMessage = 'Deploying to the Development Server';
 }
 
 const commands = [];
-// Grab all the command folders from the commands directory you created earlier
+//get command folders
 const foldersPath = join(__dirname, 'commands');
 const commandFolders = readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
-  // Grab all the command files from the commands directory you created earlier
+  //get command files
   const commandsPath = join(foldersPath, folder);
   const commandFiles = readdirSync(commandsPath).filter((file) =>
     file.endsWith('.js')
   );
-  // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+  //get SlashCommandBuilder output of each command
   for (const file of commandFiles) {
     const filePath = join(commandsPath, file);
     const command = require(filePath);
@@ -42,10 +42,10 @@ for (const folder of commandFolders) {
   }
 }
 
-// Construct and prepare an instance of the REST module
+//construct REST module
 const rest = new REST().setToken(token);
 
-// and deploy your commands!
+//deploy commands
 (async () => {
   try {
     console.log(deploymentMessage);
@@ -53,20 +53,16 @@ const rest = new REST().setToken(token);
       `Started refreshing ${commands.length} application (/) commands.`
     );
 
-    // The put method is used to fully refresh all commands in the guild with the current set
+    //refresh all commands with the current set
     const data = await rest.put(
       Routes.applicationGuildCommands(clientId, guildId),
       { body: commands }
     );
-    // const data = await rest.put(Routes.applicationCommands(clientId), {
-    //   body: commands,
-    // });
 
     console.log(
       `Successfully reloaded ${data.length} application (/) commands.`
     );
   } catch (error) {
-    // And of course, make sure you catch and log any errors!
     console.error(error);
   }
 })();

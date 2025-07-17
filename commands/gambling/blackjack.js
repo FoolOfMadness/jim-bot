@@ -79,7 +79,7 @@ const execute = async (interaction) => {
   //declare variables
   let deck = shuffleDeck(createDeck());
   let playerHand = [deck.pop(), deck.pop()];
-  let oinkHand = [deck.pop(), deck.pop()];
+  let jimHand = [deck.pop(), deck.pop()];
   let playerStand = false;
   let gameOver = false;
   const playerName = interaction.member.displayName;
@@ -108,7 +108,7 @@ const execute = async (interaction) => {
     })
     .addFields({
       name: `${dealerName}'s hand:`,
-      value: `${handToString([oinkHand[0]])} and [Hidden]`,
+      value: `${handToString([jimHand[0]])} and [Hidden]`,
     })
     .setThumbnail(interaction.member.displayAvatarURL());
 
@@ -128,7 +128,7 @@ const execute = async (interaction) => {
 
   //repeat until game is over
   while (!gameOver) {
-    //display hands, 1 of OinkBot's cards are hidden
+    //display hands, 1 of JimBot's cards are hidden
     embed = new EmbedBuilder()
       .setColor('LuminousVividPink')
       .setTitle('🃏 Blackjack Table 🃏')
@@ -138,7 +138,7 @@ const execute = async (interaction) => {
       })
       .addFields({
         name: `${dealerName}'s hand:`,
-        value: `${handToString([oinkHand[0]])} and [Hidden]`,
+        value: `${handToString([jimHand[0]])} and [Hidden]`,
       })
       .setThumbnail(interaction.member.displayAvatarURL());
 
@@ -176,7 +176,7 @@ const execute = async (interaction) => {
           })
           .addFields({
             name: `${dealerName}'s hand:`,
-            value: `${handToString([oinkHand[0]])} and [Hidden]`,
+            value: `${handToString([jimHand[0]])} and [Hidden]`,
           })
           .setThumbnail(interaction.member.displayAvatarURL());
         await action.update({ embeds: [embed] });
@@ -192,9 +192,9 @@ const execute = async (interaction) => {
         playerStand = true;
       }
     } else {
-      //OinkBot hits on 16, stands on 17
-      while (handValue(oinkHand) < 17) {
-        oinkHand.push(deck.pop());
+      //JimBot hits on 16, stands on 17
+      while (handValue(jimHand) < 17) {
+        jimHand.push(deck.pop());
       }
       //TODO this is ugly, find a better way
       embed = new EmbedBuilder()
@@ -208,21 +208,21 @@ const execute = async (interaction) => {
         })
         .addFields({
           name: `${dealerName}'s hand:`,
-          value: `${handToString(oinkHand)} (Value: ${handValue(oinkHand)})`,
+          value: `${handToString(jimHand)} (Value: ${handValue(jimHand)})`,
         })
         .setThumbnail(interaction.member.displayAvatarURL());
       await message.edit({ embeds: [embed], components: [] });
 
       //determine outcome logic
-      if (handValue(oinkHand) > 21) {
+      if (handValue(jimHand) > 21) {
         await interaction.followUp(
           `${dealerName} busts! <:derplei:1254435482108956782> ${playerName} wins! <:nyaAngry:1251302942456414218>`
         );
-      } else if (handValue(oinkHand) > handValue(playerHand)) {
+      } else if (handValue(jimHand) > handValue(playerHand)) {
         await interaction.followUp(
           `${dealerName} wins! <:smuglei:1271465346439708742>`
         );
-      } else if (handValue(oinkHand) < handValue(playerHand)) {
+      } else if (handValue(jimHand) < handValue(playerHand)) {
         await interaction.followUp(
           `${playerName} wins! <:nyaOver:1285789027701886986>`
         );

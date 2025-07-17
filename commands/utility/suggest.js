@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 //name of slash command & description
 const data = new SlashCommandBuilder()
   .setName('suggest')
-  .setDescription('Send suggestions/feedback for the mod team & Lorelei')
+  .setDescription('Send suggestions/feedback')
   .addStringOption((option) =>
     option
       .setName('category')
@@ -13,8 +13,7 @@ const data = new SlashCommandBuilder()
       .addChoices(
         { name: 'General', value: 'general' },
         { name: 'Server', value: 'server' },
-        { name: 'Twitch', value: 'twitch' },
-        { name: 'YouTube', value: 'youtube' }
+        { name: 'Twitch', value: 'twitch' }
       )
   )
   .addStringOption((option) =>

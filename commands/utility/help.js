@@ -8,7 +8,7 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
   const embed = new EmbedBuilder()
     .setColor('#00a693')
-    .setTitle('🐷 JimBot Command List 🤖')
+    .setTitle('🧙‍♂️ JimBot Command List 🤖')
     .setDescription('Here are the available commands:')
     .addFields(
       {
@@ -33,16 +33,9 @@ const execute = async (interaction) => {
         name: '🔧 Utility Commands 🕰️',
         value: `
         **/rot13** - Encode/decode a message with the ROT13 cipher.
-        **/suggest** - Allows a user to send a private suggestion to the mod team.
+        **/suggest** - Allows a user to send a private suggestion to Jim.
         **/temperature** - Converts a given temperature into 4 different scales.
         **/timestamp** - Converts the time for a city/timezone to a Discord timestamp.
-      `,
-      },
-      {
-        name: '🔨 Mod Tools 🔪',
-        value: `
-        **/filter** - Add a word or phrase for OinkBot to auto-punish.
-        **/punish** - Requires the user to apologise properly. Extreme version available.
       `,
       }
     );
