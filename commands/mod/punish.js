@@ -220,8 +220,7 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
 
 const execute = async (interaction) => {
   //punish many logic
-  const gomen =
-    'Gomenasorry ojousama supreme commander cult leader hime princess nya nya';
+  const gomen = gomenasorry[0];
   const timeout_duration =
     (interaction.options.getInteger('duration') ?? 60) * 1000;
   if (interaction.options.getSubcommand() === 'many') {

@@ -27,9 +27,9 @@ const data = new SlashCommandBuilder()
   );
 //if not Jim message
 const execute = async (interaction) => {
-  if (interaction.user.id != 'jimID') {
+  if (interaction.user.id != '240246252124504064') {
     await interaction.reply({
-      content: "You're not him. You will never be him.",
+      content: "You're not Jim. You will never be Jim.",
       ephemeral: true,
     });
   }

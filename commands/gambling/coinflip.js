@@ -75,7 +75,7 @@ const execute = async (interaction) => {
       }
     } else {
       if (wins === quantity) {
-        resultMessage = `Nyo way! **All** **__${quantity}__** flips matched ${playerName}'s bet!`;
+        resultMessage = `No way! **All** **__${quantity}__** flips matched ${playerName}'s bet!`;
       } else if (wins === 1) {
         resultMessage = `${playerName} won **__only once!__**`;
       } else if (wins > 1) {
@@ -102,7 +102,7 @@ const execute = async (interaction) => {
           inline: true,
         },
         {
-          name: 'Overall Results <:nYay2:1285207112116338718>',
+          name: 'Overall Results',
           value: resultMessage,
           inline: false,
         }

@@ -2,6 +2,7 @@
 require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
+const Sequelize = require('sequelize');
 const {
   ActivityType,
   Client,
@@ -11,6 +12,7 @@ const {
 
 const TOKEN = process.env.TOKEN;
 const DEBUG = process.env.DEBUG === 'true' ? true : false;
+const DB_PASS = process.env.DB_PASS;
 
 const client = new Client({
   intents: [
@@ -25,6 +27,25 @@ const client = new Client({
 
 client.commands = new Collection();
 client.cooldowns = new Collection();
+
+//database
+const sequelize = new Sequelize('database', 'admin', DB_PASS, {
+  host: 'localhost',
+  dialect: 'sqlite',
+  logging: DEBUG,
+  storage: 'database.sqlite',
+});
+
+//banned words
+const bannedTable = sequelize.define('regex', {
+  regex: {
+    type: Sequelize.TEXT,
+    unique: true,
+  },
+  word: Sequelize.STRING,
+});
+
+client.bannedTable = bannedTable;
 
 //load commands
 const foldersPath = path.join(__dirname, 'commands');

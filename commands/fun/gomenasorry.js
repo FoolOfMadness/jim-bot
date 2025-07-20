@@ -31,7 +31,7 @@ const execute = async (interaction) => {
   let chosen;
   if (variant === 'standard') {
     chosen = gomenasorry[0];
-  } else if (variant === 'nya') {
+  } else if (variant === 'buddy') {
     chosen = gomenasorry[1];
   } else if (variant === 'uwu') {
     chosen = gomenasorry[2];

@@ -19,6 +19,12 @@ const data = new SlashCommandBuilder()
 const execute = async (interaction) => {
   await interaction.deferReply();
   const target = interaction.options.getMember('target');
+
+  //gets user's profile pic
+  const avatar = await Canvas.loadImage(
+    target.displayAvatarURL({ extension: 'png' })
+  );
+
   const options = {
     fps: 15,
     delay: 0,
@@ -27,11 +33,6 @@ const execute = async (interaction) => {
     optimiser: true,
     quality: 100,
   };
-
-  //gets user's profile pic
-  const avatar = await Canvas.loadImage(
-    target.displayAvatarURL({ extension: 'png' })
-  );
 
   //creates new gif of user's avatar getting bonked
   const callBack = async (
