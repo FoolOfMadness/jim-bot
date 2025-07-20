@@ -1,3 +1,4 @@
+//interact with given command
 const { Events, Collection } = require('discord.js');
 
 module.exports = {

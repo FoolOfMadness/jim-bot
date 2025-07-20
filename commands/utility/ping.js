@@ -1,5 +1,7 @@
+//ping command
 const { SlashCommandBuilder } = require('discord.js');
 
+//name of slash command & description
 const data = new SlashCommandBuilder()
   .setName('ping')
   .setDescription('Replies with Pong!');

@@ -1,9 +1,10 @@
-//help command to explain other OinkBot commands - This should be updated with each new command
+//help command to explain other JimBot commands - This should be updated with each new command
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+//name of slash command & description
 const data = new SlashCommandBuilder()
   .setName('help')
-  .setDescription("Provides information about OinkBot's commands.");
+  .setDescription("Provides information about JimBot's commands.");
 
 const execute = async (interaction) => {
   const embed = new EmbedBuilder()
@@ -15,7 +16,6 @@ const execute = async (interaction) => {
         name: '🎉 Fun Commands 🎈',
         value: `
         **/bonk** - Makes a gif of a target user getting hit with a mallet.
-        **/gomenasorry** - Prints some predefined apology notes.
         **/headpat** - Makes a gif of a target user getting a headpat.
         **/truth** - Speak it in red or blue.
       `,

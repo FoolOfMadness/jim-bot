@@ -13,7 +13,7 @@ module.exports = {
    */
   async execute(message) {
     try {
-      //check if message, member, or bannedWords are invalid, or if the message is from oinkbot
+      //check if message, member, or bannedWords are invalid, or if the message is from JimBot
       if (
         !message?.member ||
         message.member.id === process.env.CLIENT_ID ||

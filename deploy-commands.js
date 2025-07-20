@@ -11,10 +11,10 @@ let guildId;
 let deploymentMessage;
 if (argv.deploy) {
   guildId = process.env.MAIN_GUILD_ID;
-  deploymentMessage = "Deploying to Jim's server";
+  deploymentMessage = "Deploying to Nai's server";
 } else {
   guildId = process.env.DEV_GUILD_ID;
-  deploymentMessage = 'Deploying to the Development Server';
+  deploymentMessage = "Deploying to Jim's Server";
 }
 
 const commands = [];

@@ -1,3 +1,4 @@
+//random math function to choose an option with probability
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);

@@ -1,3 +1,4 @@
+//confirm bot ready status
 const { Events } = require('discord.js');
 const twitchManager = require('../twitchManager');
 

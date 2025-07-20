@@ -1,5 +1,7 @@
+//server command
 const { SlashCommandBuilder } = require('discord.js');
 
+//name of slash command & description
 const data = new SlashCommandBuilder()
   .setName('server')
   .setDescription('Provides information about the server.');

@@ -1,4 +1,4 @@
-//add word/phrase to oinkbot's banned word list
+//add word/phrase to JimBot's banned word list
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 //name of slash commands, subcommands, & descriptions

@@ -1,8 +1,9 @@
+//red & blue truth umineko command
 const { createCanvas, loadImage } = require('canvas');
 const path = require('node:path');
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 
-// command data
+//name of slash command & description
 const data = new SlashCommandBuilder()
   .setName('truth')
   .setDescription('Speak your truth.')
@@ -20,14 +21,14 @@ const data = new SlashCommandBuilder()
       .setRequired(false)
   );
 
-// execute function
+//gets input text to format
 const execute = async (interaction) => {
   await interaction.deferReply();
   let inputText = interaction.options.getString('truth').slice(0, 225);
-  const chosenColor = interaction.options.getString('color') || 'red'; // default to red
+  const chosenColor = interaction.options.getString('color') || 'red'; //default to red
 
   try {
-    // load background image (change to a PNG)
+    //load background image (change to a PNG)
     const bgImage = await loadImage(path.join(__dirname, 'bg.gif'));
     const { width, height } = bgImage;
 
@@ -35,7 +36,7 @@ const execute = async (interaction) => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(bgImage, 0, 0);
 
-    // format text
+    //format text
     let formattedText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(
       1
     )}`;
@@ -44,7 +45,7 @@ const execute = async (interaction) => {
     }
     formattedText = `"${formattedText}"`;
 
-    // split text into lines without cutting off words
+    //split text into lines without cutting off words
     const linesToDraw = [];
     const maxLineLength = 59;
     let words = formattedText.split(' ');
@@ -55,14 +56,14 @@ const execute = async (interaction) => {
         linesToDraw.push(currentLine);
         currentLine = word;
       } else {
-        currentLine += (currentLine.length > 0 ? ' ' : '') + word; // add word to current line
+        currentLine += (currentLine.length > 0 ? ' ' : '') + word; //add word to current line
       }
     }
-    if (currentLine) linesToDraw.push(currentLine); // add last line if any
+    if (currentLine) linesToDraw.push(currentLine); //add last line if any
 
     ctx.font = '20px Courier New';
 
-    // draw each character with specific colors
+    //draw each character with specific colors
     let x = 50;
     let y = 45;
     const lineHeight = 30;
@@ -77,7 +78,7 @@ const execute = async (interaction) => {
       y += lineHeight;
     });
 
-    // create PNG buffer
+    //create PNG buffer
     const buffer = canvas.toBuffer('image/png');
     const attachment = new AttachmentBuilder(buffer, { name: 'truth.png' });
 

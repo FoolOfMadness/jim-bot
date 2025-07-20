@@ -9,6 +9,7 @@ const {
   EmbedBuilder,
 } = require('discord.js');
 const { chooseWithProbabilities } = require('../../randomUtil.js');
+const gomenasorry = require('../fun/gomenasorry.js');
 
 //name of slash commands, subcommands, & descriptions
 const data = new SlashCommandBuilder()
@@ -86,20 +87,17 @@ const data = new SlashCommandBuilder()
 
 //extreme punish with variants for the message
 const extremePunish = async (channel, target, duration, timeInSeconds) => {
-  const gomens = [
-    [
-      'Gomenasorry ojousama supreme commander cult leader hime princess nya nya',
-      'use the buttons below to type out the full gomenasorry message. Good luck!',
-    ],
-    [
-      'Gomenyasorry ojousama supreme commyander cult leader himye princyess nya nya',
-      'use the buttons below to type out the full gome*NYA*sorry message. This is a rare variant! Good luck!',
-    ],
-    [
-      'sowwy Commyandew, I am simpwy too stupid of a degenyewate t-to undewstand youw shawp wits and amazing tawents!!11',
-      'use the buttons below to type out the UWUfied gomenasorry message. This is an ultra rare variant! Good luck!',
-    ],
+  const instructions = [
+    "use the buttons below to type out 'gomenasorry'. Good luck!",
+    'use the buttons below to type out the full gomenasorry message. This is a rare variant! Good luck!',
+    'use the buttons below to type out the UWU-ified gomenasorry message. This is an ultra rare variant! Good luck!',
   ];
+
+  //combine gomenasorry with instructions
+  const gomens = gomenasorry.map((message, index) => [
+    message,
+    instructions[index] || '',
+  ]);
 
   //chooses the variant based on chosen probability
   const choice = chooseWithProbabilities(gomens, [
@@ -109,22 +107,15 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
   ]);
   const [gomen, displayText] = choice;
 
-  let letters = gomen.split('');
-  letters = [...new Set(letters)];
-  const buttons = [];
-
   //create interactive buttons
-  for (let i = 0; i < letters.length; i++) {
-    let letter = letters[i];
-
+  let letters = [...new Set(gomen.split(''))];
+  const buttons = letters.map((letter) => {
     if (letter === ' ') letter = 'space';
-
-    const btn = new ButtonBuilder()
+    return new ButtonBuilder()
       .setCustomId(letter)
       .setLabel(letter.toUpperCase())
       .setStyle(ButtonStyle.Secondary);
-    buttons.push(btn);
-  }
+  });
 
   const rows = [];
 
@@ -284,7 +275,7 @@ const execute = async (interaction) => {
         collected.each(async (msg) => {
           repliedMap[msg.member.id] = true;
           if (msg.content.toLowerCase() === gomen.toLowerCase()) {
-            await msg.reply(`You're off the hook for now, oinker.`);
+            await msg.reply(`You're off the hook for now, buddy.`);
           } else {
             await msg.reply(
               `You have failed to apologize. Time for a little timeout.`
@@ -338,7 +329,7 @@ const execute = async (interaction) => {
         const msg = collected.first();
         replied = true;
         if (msg.content.toLowerCase() === gomen.toLowerCase()) {
-          await msg.reply(`You're off the hook for now, oinker.`);
+          await msg.reply(`You're off the hook for now, buddy.`);
         } else {
           await msg.reply(
             `You have failed to apologize. Time for a little timeout.`

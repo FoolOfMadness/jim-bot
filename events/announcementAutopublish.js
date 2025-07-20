@@ -2,12 +2,7 @@
 const { Events, ChannelType } = require('discord.js');
 
 //announcement channel IDs
-const announcementChannels = [
-  '1247315856967598101',
-  '1247663621975179375',
-  '1247573120777191506',
-  '1247573147205636117',
-];
+const announcementChannels = ['channelID'];
 
 module.exports = {
   name: Events.MessageCreate,

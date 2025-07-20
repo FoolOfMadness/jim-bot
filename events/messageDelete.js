@@ -1,3 +1,4 @@
+//delete message on event
 const { Events } = require('discord.js');
 
 module.exports = {

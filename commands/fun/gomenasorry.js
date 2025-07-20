@@ -12,7 +12,7 @@ const data = new SlashCommandBuilder()
       .setRequired(true)
       .addChoices(
         { name: 'standard', value: 'standard' },
-        { name: 'nya', value: 'nya' },
+        { name: 'buddy', value: 'buddy' },
         { name: 'uwu', value: 'uwu' }
       )
   );
@@ -20,9 +20,9 @@ const data = new SlashCommandBuilder()
 //gomenasorry variant messages
 const execute = async (interaction) => {
   const gomenasorry = [
-    'Gomenasorry ojousama supreme commander cult leader hime princess nya nya',
-    'Gomenyasorry ojousama supreme commyander cult leader himye princyess nya nya',
-    'sowwy Commyandew, I am simpwy too stupid of a degenyewate t-to undewstand youw shawp wits and amazing tawents!!11',
+    'Gomenasorry',
+    'Gomenasorry buddies, arigathankies',
+    'G-gomenasowwy buddies, UwU purrs nuzzles OwO',
   ];
 
   //selects variant message based on user input

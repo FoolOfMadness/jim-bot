@@ -1,3 +1,4 @@
+//autocomplete command input
 const { Events } = require('discord.js');
 
 module.exports = {
