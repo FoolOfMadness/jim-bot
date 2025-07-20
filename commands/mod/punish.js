@@ -211,7 +211,7 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
         await response.reply(`You were too late, ${target}, delete yourself.`);
       }
       if (target.manageable || target.moderatable) {
-        await target.timeout(duration, 'Failed to apologize');
+        await target.timeout(duration, 'Failed to apologise');
       }
     }
     await response.edit({ components: [] });
@@ -247,7 +247,7 @@ const execute = async (interaction) => {
     //alert user of the punish command so they interact
     punishMessage += validTargets.join(', ');
     punishMessage +=
-      "! It's time for you to apologize!\n\nYou have one minute to send a proper apology in this channel.\n\nAny other message but the full gomenasorry text will get you timed out!";
+      "! It's time for you to apologise!\n\nYou have one minute to send a proper apology in this channel.\n\nAny other message but the full gomenasorry text will get you timed out!";
     await interaction.followUp(punishMessage);
 
     const filter = (m) => {
@@ -277,10 +277,10 @@ const execute = async (interaction) => {
             await msg.reply(`You're off the hook for now, buddy.`);
           } else {
             await msg.reply(
-              `You have failed to apologize. Time for a little timeout.`
+              `You have failed to apologise. Time for a little timeout.`
             );
             try {
-              await msg.member.timeout(timeout_duration, 'Failed to apologize');
+              await msg.member.timeout(timeout_duration, 'Failed to apologise');
             } catch (e) {
               console.log(e);
             }
@@ -294,7 +294,7 @@ const execute = async (interaction) => {
               `You were too late, <@${t.id}>. Get timed out!`
             );
             try {
-              await t.timeout(timeout_duration, 'Failed to apologize');
+              await t.timeout(timeout_duration, 'Failed to apologise');
             } catch (e) {
               console.log(e);
             }
@@ -308,14 +308,14 @@ const execute = async (interaction) => {
     //check if can timeout user
     if (!target.manageable || !target.moderatable) {
       await interaction.editReply(
-        "I don't have permission to timeout this user"
+        "I don't have permission to timeout this user 😒"
       );
       return;
     }
 
     //tell user about the punish
     await interaction.channel.send(
-      `Hey, <@${target.id}>! It's time for you to apologize!\n\nYou have one minute to send a proper apology in this channel.\n\nAny other message but the full gomenasorry text will get you timed out!`
+      `Hey, <@${target.id}>! It's time for you to apologise!\n\nYou have one minute to send a proper apology in this channel.\n\nAny other message but the full gomenasorry text will get you timed out!`
     );
 
     const filter = (m) => m.member.id === target.id;
@@ -331,10 +331,10 @@ const execute = async (interaction) => {
           await msg.reply(`You're off the hook for now, buddy.`);
         } else {
           await msg.reply(
-            `You have failed to apologize. Time for a little timeout.`
+            `You have failed to apologise. Time for a little timeout.`
           );
           try {
-            await target.timeout(timeout_duration, 'Failed to apologize');
+            await target.timeout(timeout_duration, 'Failed to apologise');
           } catch (e) {
             console.log(e);
           }
@@ -347,7 +347,7 @@ const execute = async (interaction) => {
             `You were too late, <@${target.id}>. Get timed out!`
           );
           try {
-            await target.timeout(timeout_duration, 'Failed to apologize');
+            await target.timeout(timeout_duration, 'Failed to apologise');
           } catch (e) {
             console.log(e);
           }
