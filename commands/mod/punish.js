@@ -9,7 +9,7 @@ const {
   EmbedBuilder,
 } = require('discord.js');
 const { chooseWithProbabilities } = require('../../randomUtil.js');
-const gomenasorry = require('../fun/gomenasorry.js');
+const { gomenasorry } = require('../fun/gomenasorry.js');
 
 //name of slash commands, subcommands, & descriptions
 const data = new SlashCommandBuilder()
@@ -89,7 +89,7 @@ const data = new SlashCommandBuilder()
 const extremePunish = async (channel, target, duration, timeInSeconds) => {
   const instructions = [
     "use the buttons below to type out 'gomenasorry'. Good luck!",
-    'use the buttons below to type out the full gomenasorry message. This is a rare variant! Good luck!',
+    'use the buttons below to type out the gomenasorry buddies message. This is a rare variant! Good luck!',
     'use the buttons below to type out the UWU-ified gomenasorry message. This is an ultra rare variant! Good luck!',
   ];
 
@@ -110,9 +110,9 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
   //create interactive buttons
   let letters = [...new Set(gomen.split(''))];
   const buttons = letters.map((letter) => {
-    if (letter === ' ') letter = 'space';
+    let id = letter === ' ' ? 'space' : letter.toLowerCase();
     return new ButtonBuilder()
-      .setCustomId(letter)
+      .setCustomId(id)
       .setLabel(letter.toUpperCase())
       .setStyle(ButtonStyle.Secondary);
   });
@@ -177,18 +177,19 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
 
   //add progress to message
   collector.on('collect', async (i) => {
-    gomenText += i.customId === 'space' ? ' ' : i.customId;
-    text += i.customId === 'space' ? ' ' : i.customId;
+    const clickedChar = i.customId === 'space' ? ' ' : i.customId.toLowerCase();
+
+    gomenText += clickedChar;
+    text += clickedChar;
     embed.setDescription(text);
     await i.update({ embeds: [embed] });
 
     //stop with failure
-    if (!gomen.startsWith(gomenText)) {
+    if (!gomen.toLowerCase().startsWith(gomenText.toLowerCase())) {
       collector.stop('failure');
     }
-
     //success message
-    if (gomenText === gomen) {
+    if (gomenText.toLowerCase() === gomen.toLowerCase()) {
       collector.stop('success');
       await channel.send(
         `Congratulations, ${target}, you live to see another day.`

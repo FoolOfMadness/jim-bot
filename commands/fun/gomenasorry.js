@@ -38,4 +38,4 @@ const execute = async (interaction) => {
   await interaction.reply(chosen);
 };
 
-module.exports = { data, execute };
+module.exports = { data, execute, gomenasorry };
