@@ -1,23 +1,21 @@
 //confirm bot ready status
-const { Events } = require('discord.js');
+import { Events } from 'discord.js';
 
-module.exports = {
-  name: Events.ClientReady,
-  once: true,
-  async execute(client) {
-    await client.bannedTable.sync();
+export const name = Events.ClientReady;
+export const once = true;
+export async function execute(client) {
+  await client.bannedTable.sync();
 
-    let bannedWords = await client.bannedTable.findAll({
-      attributes: ['regex', 'word'],
-    });
+  let bannedWords = await client.bannedTable.findAll({
+    attributes: ['regex', 'word'],
+  });
 
-    bannedWords = bannedWords.map((w) => {
-      return {
-        [w.word]: new RegExp(w.regex, 'i'),
-      };
-    });
-    client.bannedWords = bannedWords;
+  bannedWords = bannedWords.map((w) => {
+    return {
+      [w.word]: new RegExp(w.regex, 'i'),
+    };
+  });
+  client.bannedWords = bannedWords;
 
-    console.log(`Ready! Logged in as ${client.user.tag}`);
-  },
-};
+  console.log(`Ready! Logged in as ${client.user.tag}`);
+}

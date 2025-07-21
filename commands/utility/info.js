@@ -1,8 +1,8 @@
 //info command
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('info')
   .setDescription('Get info about a user or a server')
   .addSubcommand((subcommand) =>
@@ -17,7 +17,7 @@ const data = new SlashCommandBuilder()
     subcommand.setName('server').setDescription('Info about the server')
   );
 
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   if (interaction.options.getSubcommand() === 'user') {
     const user = interaction.options.getUser('target');
 
@@ -34,5 +34,3 @@ const execute = async (interaction) => {
     );
   }
 };
-
-module.exports = { data, execute };

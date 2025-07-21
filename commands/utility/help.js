@@ -1,12 +1,12 @@
 //help command to explain other JimBot commands - This should be updated with each new command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('help')
   .setDescription("Provides information about JimBot's commands.");
 
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   const embed = new EmbedBuilder()
     .setColor('#00a693')
     .setTitle('🧙‍♂️ JimBot Command List 🤖')
@@ -46,5 +46,3 @@ const execute = async (interaction) => {
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
 };
-
-module.exports = { data, execute };

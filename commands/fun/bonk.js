@@ -1,11 +1,11 @@
 //bonk message command
-const canvasGif = require('canvas-gif');
-const Canvas = require('canvas');
-const path = require('node:path');
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+import canvasGif from 'canvas-gif';
+import { loadImage, createCanvas } from 'canvas';
+import { join } from 'node:path';
+import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('bonk')
   .setDescription('Kill them with hammers')
   .addUserOption((option) =>
@@ -16,14 +16,12 @@ const data = new SlashCommandBuilder()
   );
 
 //adds user's profile pic to canvas
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   await interaction.deferReply();
   const target = interaction.options.getMember('target');
 
   //gets user's profile pic
-  const avatar = await Canvas.loadImage(
-    target.displayAvatarURL({ extension: 'png' })
-  );
+  const avatar = await loadImage(target.displayAvatarURL({ extension: 'png' }));
 
   const options = {
     fps: 15,
@@ -37,12 +35,12 @@ const execute = async (interaction) => {
   //creates new gif of user's avatar getting bonked
   const callBack = async (
     context,
-    width,
-    height,
-    totalFrames,
+    _width,
+    _height,
+    _totalFrames,
     currentFrame
   ) => {
-    const canvas = Canvas.createCanvas(avatar.width, avatar.height);
+    const canvas = createCanvas(avatar.width, avatar.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(avatar, 0, 0, avatar.width, avatar.height);
     context.globalCompositeOperation = 'destination-over';
@@ -53,7 +51,7 @@ const execute = async (interaction) => {
     }
   };
   //sends new bonk gif and message
-  canvasGif(path.join(__dirname, 'bonk.gif'), callBack, options)
+  canvasGif(join(__dirname, 'bonk.gif'), callBack, options)
     .then((buffer) => {
       const attachment = new AttachmentBuilder(buffer, { name: 'bonk.gif' });
       return interaction.followUp({
@@ -69,4 +67,3 @@ const execute = async (interaction) => {
       });
     });
 };
-module.exports = { data, execute };

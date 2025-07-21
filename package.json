@@ -1,7 +1,8 @@
 {
   "name": "jim-bot",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Jim's very cool Discord bot",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "deploy": "node deploy-commands.js",

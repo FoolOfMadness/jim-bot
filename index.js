@@ -1,19 +1,26 @@
 //main
-require('dotenv').config();
-const fs = require('node:fs');
-const path = require('node:path');
-const Sequelize = require('sequelize');
-const {
+import 'dotenv/config';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+import { Sequelize } from 'sequelize';
+import {
   ActivityType,
   Client,
   Collection,
   GatewayIntentBits,
-} = require('discord.js');
+} from 'discord.js';
 
+//resolve __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+//environment variables
 const TOKEN = process.env.TOKEN;
-const DEBUG = process.env.DEBUG === 'true' ? true : false;
+const DEBUG = process.env.DEBUG === 'true';
 const DB_PASS = process.env.DB_PASS;
 
+//client setup
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -28,7 +35,7 @@ const client = new Client({
 client.commands = new Collection();
 client.cooldowns = new Collection();
 
-//database
+//sequelize database
 const sequelize = new Sequelize('database', 'admin', DB_PASS, {
   host: 'localhost',
   dialect: 'sqlite',
@@ -56,14 +63,15 @@ for (const folder of commandFolders) {
   const commandFiles = fs
     .readdirSync(commandsPath)
     .filter((file) => file.endsWith('.js'));
+
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
+    const command = await import(`file://${filePath}`);
     if ('data' in command && 'execute' in command) {
       client.commands.set(command.data.name, command);
     } else {
-      console.log(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+      console.warn(
+        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" export.`
       );
     }
   }
@@ -77,7 +85,7 @@ const eventFiles = fs
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
-  const event = require(filePath);
+  const event = await import(`file://${filePath}`);
   if (event.once) {
     if (DEBUG) console.log(`Adding one-time event ${event.name} from ${file}`);
     client.once(event.name, (...args) => event.execute(...args));
@@ -87,4 +95,5 @@ for (const file of eventFiles) {
   }
 }
 
+//start bot
 client.login(TOKEN);

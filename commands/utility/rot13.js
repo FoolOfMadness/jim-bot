@@ -1,8 +1,8 @@
 //cipher (ROT13) command
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('rot13')
   .setDescription('Encode or decode a message using ROT13')
   .addStringOption((option) =>
@@ -22,7 +22,7 @@ const rot13 = (str) => {
 };
 
 //cipher the text
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //get the user input
     const message = interaction.options.getString('message');
@@ -43,5 +43,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

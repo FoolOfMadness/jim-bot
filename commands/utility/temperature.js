@@ -1,8 +1,8 @@
 //temperature conversion command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('temperature')
   .setDescription('Convert temperature between different scales')
   .addNumberOption((option) =>
@@ -25,7 +25,7 @@ const data = new SlashCommandBuilder()
   );
 
 //convert the temperature
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //declare variables, get user inputs
     const value = interaction.options.getNumber('value');
@@ -88,5 +88,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

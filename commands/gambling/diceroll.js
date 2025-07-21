@@ -1,9 +1,9 @@
 //diceroll command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const numberToWords = require('number-to-words');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { toWords } from 'number-to-words';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('diceroll')
   .setDescription('Roll some dice')
   .addIntegerOption((option) =>
@@ -28,7 +28,7 @@ const data = new SlashCommandBuilder()
   );
 
 //roll the dice
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //set playername as username
     const playerName = interaction.member.displayName;
@@ -84,7 +84,7 @@ const execute = async (interaction) => {
     const resultText = quantity === 1 ? 'result' : 'results';
 
     //convert quantity to words
-    const quantityWords = numberToWords.toWords(quantity);
+    const quantityWords = toWords(quantity);
 
     //make an embed with the results
     const embed = new EmbedBuilder()
@@ -155,5 +155,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

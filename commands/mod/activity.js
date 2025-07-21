@@ -1,8 +1,8 @@
 //set bot activity status command
-const { SlashCommandBuilder, ActivityType } = require('discord.js');
+import { SlashCommandBuilder, ActivityType } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('activity')
   .setDescription('Set activity (developer only)')
   .addStringOption((option) =>
@@ -26,7 +26,7 @@ const data = new SlashCommandBuilder()
       .setRequired(true)
   );
 //if not Jim message
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   if (interaction.user.id != '240246252124504064') {
     await interaction.reply({
       content: "You're not Jim. You will never be Jim.",
@@ -55,5 +55,3 @@ const execute = async (interaction) => {
     flags: MessageFlags.Ephemeral,
   });
 };
-
-module.exports = { data, execute };

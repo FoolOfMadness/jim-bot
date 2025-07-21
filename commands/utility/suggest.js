@@ -1,8 +1,8 @@
 //suggestion command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('suggest')
   .setDescription('Send suggestions/feedback')
   .addStringOption((option) =>
@@ -30,7 +30,7 @@ const data = new SlashCommandBuilder()
   );
 
 //send the suggestion
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //get the suggestion message, category, and attachment from the user
     const suggestion = interaction.options.getString('message');
@@ -73,5 +73,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

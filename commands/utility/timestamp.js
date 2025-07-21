@@ -1,9 +1,9 @@
 //timestamp command
-const { SlashCommandBuilder } = require('discord.js');
-const moment = require('moment-timezone');
+import { SlashCommandBuilder } from 'discord.js';
+import moment, { tz as _tz } from 'moment-timezone';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('timestamp')
   .setDescription(
     "Convert your timezone's date & time to a timestamp (default current time & date)"
@@ -65,9 +65,9 @@ const commonTimezones = [
 ];
 
 //all timezones labels
-const allTimezones = moment.tz.names().map((tz) => {
+const allTimezones = _tz.names().map((tz) => {
   const city = tz.split('/')[1]?.replace('_', ' ') || tz;
-  const abbreviation = moment.tz(tz).format('z');
+  const abbreviation = _tz(tz).format('z');
   const fullName = `${city} (${abbreviation}, ${tz})`;
   return { name: fullName, value: tz };
 });
@@ -76,7 +76,7 @@ const allTimezones = moment.tz.names().map((tz) => {
 const sortedTimezones = [
   ...commonTimezones.map((tz) => {
     const city = tz.split('/')[1]?.replace('_', ' ') || tz;
-    const abbreviation = moment.tz(tz).format('z');
+    const abbreviation = _tz(tz).format('z');
     return { name: `${city} (${abbreviation}, ${tz})`, value: tz };
   }),
   ...allTimezones.filter((tz) => !commonTimezones.includes(tz.value)), //remove duplicates
@@ -142,11 +142,10 @@ const autocomplete = async (interaction) => {
 };
 
 //convert the time
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //set the timezone,date & time as user input
-    const timezone =
-      interaction.options.getString('timezone') || moment.tz.guess(); //default system timezone
+    const timezone = interaction.options.getString('timezone') || _tz.guess(); //default system timezone
     const date =
       interaction.options.getString('date') || moment().format('YYYY-MM-DD'); //default current date
     const time =
@@ -154,7 +153,7 @@ const execute = async (interaction) => {
     const format = interaction.options.getString('format') || 'F'; //default full format
 
     //validate timezone, date, & time
-    if (!moment.tz.zone(timezone)) {
+    if (!_tz.zone(timezone)) {
       return interaction.reply({
         content: 'Invalid timezone!',
         flags: MessageFlags.Ephemeral,
@@ -172,11 +171,7 @@ const execute = async (interaction) => {
     }
 
     //combine date, time, & timezone
-    const userDateTime = moment.tz(
-      `${date} ${time}`,
-      'YYYY-MM-DD HH:mm',
-      timezone
-    );
+    const userDateTime = _tz(`${date} ${time}`, 'YYYY-MM-DD HH:mm', timezone);
 
     //convert to a timestamp
     const timestamp = userDateTime.unix();
@@ -209,5 +204,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute, autocomplete };

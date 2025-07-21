@@ -1,10 +1,10 @@
 //red & blue truth umineko command
-const { createCanvas, loadImage } = require('canvas');
-const path = require('node:path');
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+import { createCanvas, loadImage } from 'canvas';
+import { join } from 'node:path';
+import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('truth')
   .setDescription('Speak your truth.')
   .addStringOption((option) =>
@@ -22,14 +22,14 @@ const data = new SlashCommandBuilder()
   );
 
 //gets input text to format
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   await interaction.deferReply();
   let inputText = interaction.options.getString('truth').slice(0, 225);
   const chosenColor = interaction.options.getString('color') || 'red'; //default to red
 
   try {
     //load background image (change to a PNG)
-    const bgImage = await loadImage(path.join(__dirname, 'bg.gif'));
+    const bgImage = await loadImage(join(__dirname, 'bg.gif'));
     const { width, height } = bgImage;
 
     const canvas = createCanvas(width, height);
@@ -94,5 +94,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

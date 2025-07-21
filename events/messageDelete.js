@@ -1,7 +1,5 @@
 //delete message on event
-const { Events } = require('discord.js');
+import { Events } from 'discord.js';
 
-module.exports = {
-  name: Events.MessageDelete,
-  async execute(message) {},
-};
+export const name = Events.MessageDelete;
+export async function execute(message) {}

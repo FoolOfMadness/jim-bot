@@ -1,12 +1,12 @@
 //ping command
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('ping')
   .setDescription('Replies with Pong!');
 
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   const sent = await interaction.reply({
     content: 'Pinging...',
     fetchReply: true,
@@ -19,5 +19,3 @@ const execute = async (interaction) => {
 };
 
 const cooldown = 5;
-
-module.exports = { data, execute, cooldown };

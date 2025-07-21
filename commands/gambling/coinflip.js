@@ -1,8 +1,8 @@
 //coinflip command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('coinflip')
   .setDescription('Flip a coin for heads or tails')
   .addStringOption((option) =>
@@ -20,7 +20,7 @@ const data = new SlashCommandBuilder()
   );
 
 //flip the coin
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //set player name as username & choice as bet
     const playerName = interaction.member.displayName;
@@ -118,5 +118,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

@@ -1,5 +1,5 @@
 //punish related commands
-const {
+import {
   SlashCommandBuilder,
   PermissionFlagsBits,
   ButtonBuilder,
@@ -7,12 +7,12 @@ const {
   ActionRowBuilder,
   ComponentType,
   EmbedBuilder,
-} = require('discord.js');
-const { chooseWithProbabilities } = require('../../randomUtil.js');
-const { gomenasorry } = require('../fun/gomenasorry.js');
+} from 'discord.js';
+import { chooseWithProbabilities } from '../../randomUtil.js';
+import { gomenasorry } from '../fun/gomenasorry.js';
 
 //name of slash commands, subcommands, & descriptions
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('punish')
   .setDescription('Punish a disobedient buddy.')
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
@@ -219,7 +219,7 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
   });
 };
 
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   //punish many logic
   const gomen = gomenasorry[0];
   const timeout_duration =
@@ -370,5 +370,3 @@ const execute = async (interaction) => {
     await interaction.editReply('Firing Destroy Beam!');
   }
 };
-
-module.exports = { data, execute, extremePunish };

@@ -1,8 +1,8 @@
 //magic8ball command
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('magic8ball')
   .setDescription('Ask the Magic 8-Ball a question')
   .addStringOption((option) =>
@@ -45,7 +45,7 @@ const responses = [
 ];
 
 //ask the 8ball
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   try {
     //get the question from the user
     const question = interaction.options.getString('question');
@@ -70,5 +70,3 @@ const execute = async (interaction) => {
     });
   }
 };
-
-module.exports = { data, execute };

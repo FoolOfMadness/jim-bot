@@ -1,15 +1,15 @@
 //gomenasorry message commands
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 //gomenasorry variant messages
-const gomenasorry = [
+export const gomenasorry = [
   'Gomenasorry',
   'Gomenasorry buddies, arigathankies',
   'G-gomenasowwy buddies, UwU purrs nuzzles OwO',
 ];
 
 //name of slash command, description, &  variants
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('gomenasorry')
   .setDescription('Apologises properly.')
   .addStringOption((option) =>
@@ -25,7 +25,7 @@ const data = new SlashCommandBuilder()
   );
 
 //selects variant message based on user input
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   const variant = interaction.options.getString('variant');
   let chosen;
   if (variant === 'standard') {
@@ -37,5 +37,3 @@ const execute = async (interaction) => {
   }
   await interaction.reply(chosen);
 };
-
-module.exports = { data, execute, gomenasorry };

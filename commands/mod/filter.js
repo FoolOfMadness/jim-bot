@@ -1,8 +1,8 @@
 //add word/phrase to JimBot's banned word list
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 
 //name of slash commands, subcommands, & descriptions
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('filter')
   .setDescription('Filter bad words from the server')
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
@@ -40,7 +40,7 @@ const data = new SlashCommandBuilder()
   );
 
 //try catch block for subcommands
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
 
   if (interaction.options.getSubcommand() === 'add') {
@@ -98,5 +98,3 @@ const execute = async (interaction) => {
     }
   }
 };
-
-module.exports = { data, execute };

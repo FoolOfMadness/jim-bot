@@ -1,14 +1,14 @@
 //blackjack game command
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
-} = require('discord.js');
+} from 'discord.js';
 
 //name of slash command & description
-const data = new SlashCommandBuilder()
+export const data = new SlashCommandBuilder()
   .setName('blackjack')
   .setDescription('Play a game of blackjack');
 
@@ -73,7 +73,7 @@ const handValue = (hand) => {
 };
 
 //start the game
-const execute = async (interaction) => {
+export const execute = async (interaction) => {
   await interaction.reply('Game is starting right now!');
 
   //declare variables
@@ -233,5 +233,3 @@ const execute = async (interaction) => {
 const handToString = (hand) => {
   return hand.map((card) => `${card.value} of ${card.suit}`).join(', ');
 };
-
-module.exports = { data, execute };
