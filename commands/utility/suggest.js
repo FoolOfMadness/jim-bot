@@ -63,13 +63,13 @@ const execute = async (interaction) => {
     //reply to the user
     await interaction.reply({
       content: 'Your suggestion has been sent successfully!',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while sending your suggestion...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

@@ -66,7 +66,7 @@ const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while consulting the Magic 8-Ball...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

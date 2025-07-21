@@ -33,13 +33,13 @@ const execute = async (interaction) => {
     //give result
     await interaction.reply({
       content: `🔒 **ROT13 Result:**\n${result}`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while processing the message...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

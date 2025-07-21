@@ -157,17 +157,17 @@ const execute = async (interaction) => {
     if (!moment.tz.zone(timezone)) {
       return interaction.reply({
         content: 'Invalid timezone!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
       return interaction.reply({
         content: 'Invalid date format. Please use YYYY-MM-DD for date!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else if (!moment(time, 'HH:mm', true).isValid()) {
       return interaction.reply({
         content: 'Invalid time format. Please use HH:mm for time!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -196,7 +196,7 @@ const execute = async (interaction) => {
       //send ephemeral message first, this is to protect the users country/timezone
       await interaction.reply({
         content: `You can copy & paste this: \`<t:${timestamp}:${format}>\`\nThis message is invisible to protect you!`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       //follow-up message that shows the timestamp publicly
       await interaction.followUp(publicMessage);
@@ -205,7 +205,7 @@ const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while converting the time...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

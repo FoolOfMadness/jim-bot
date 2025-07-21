@@ -157,7 +157,7 @@ const execute = async (interaction) => {
         await message.edit({ components: [] }); // removes the buttons
         return interaction.followUp({
           content: 'You ran out of time to play!',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         }); // exit command here
       }
       //hit

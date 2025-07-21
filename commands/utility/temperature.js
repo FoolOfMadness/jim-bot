@@ -84,7 +84,7 @@ const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while converting the temperature...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

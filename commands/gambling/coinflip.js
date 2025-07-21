@@ -32,7 +32,7 @@ const execute = async (interaction) => {
       await interaction.reply({
         content:
           'Please enter a valid number of coins to flip between 1 and 100!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -114,7 +114,7 @@ const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while flipping...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

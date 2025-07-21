@@ -90,7 +90,7 @@ const execute = async (interaction) => {
     console.error(error);
     return interaction.followUp({
       content: 'Something went wrong, whoops.',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

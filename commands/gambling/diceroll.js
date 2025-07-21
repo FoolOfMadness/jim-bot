@@ -46,7 +46,7 @@ const execute = async (interaction) => {
     if (sides < 3 || sides > 100) {
       await interaction.reply({
         content: 'Please enter a valid number of sides between 3 and 100!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -55,7 +55,7 @@ const execute = async (interaction) => {
     if (quantity <= 0 || quantity > 100) {
       await interaction.reply({
         content: 'Please enter a valid number of dice between 1 and 100!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -64,7 +64,7 @@ const execute = async (interaction) => {
     if (modifier < -50 || modifier > 50) {
       await interaction.reply({
         content: 'Please enter a modifier between -50 and +50!',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -151,7 +151,7 @@ const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while rolling the dice...',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 };

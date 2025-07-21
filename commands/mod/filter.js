@@ -69,7 +69,7 @@ const execute = async (interaction) => {
         console.error(error);
         return interaction.followUp({
           content: 'Something went wrong.',
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     }
@@ -93,7 +93,7 @@ const execute = async (interaction) => {
       console.error(error);
       return interaction.followUp({
         content: 'Something went wrong...',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   }
