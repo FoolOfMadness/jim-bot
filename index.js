@@ -68,6 +68,7 @@ for (const folder of commandFolders) {
     const filePath = path.join(commandsPath, file);
     const command = await import(`file://${filePath}`);
     if ('data' in command && 'execute' in command) {
+      command.category = folder;
       client.commands.set(command.data.name, command);
     } else {
       console.warn(
@@ -76,6 +77,9 @@ for (const folder of commandFolders) {
     }
   }
 }
+
+//export commands to help
+export const commands = client.commands;
 
 //load events
 const eventsPath = path.join(__dirname, 'events');
