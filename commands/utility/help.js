@@ -5,6 +5,7 @@ import {
   MessageFlagsBitField,
 } from 'discord.js';
 
+//label categories
 const categoryLabels = {
   fun: '🎉 Fun Commands 🎈',
   gambling: '🃏 Gambling Commands 🎲',
@@ -19,8 +20,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("Provides information about JimBot's commands.");
 
 export const execute = async (interaction) => {
+  //get list of commands
   const commands = interaction.client.commands;
 
+  //create embed
   const embed = new EmbedBuilder()
     .setColor('#00a693')
     .setTitle('🧙‍♂️ JimBot Command List 🤖')
@@ -28,19 +31,25 @@ export const execute = async (interaction) => {
 
   const categories = {};
 
+  //assign commands to relevent categories
   for (const command of commands.values()) {
-    const category = command.category || 'Other';
+    const category = categoryLabels[command.category]
+      ? command.category
+      : 'misc'; //default to misc
     if (!categories[category]) categories[category] = [];
     categories[category].push(
-      `**/${command.data.name}** – ${command.data.description}`
+      `**/${command.data.name}** - ${command.data.description}`
     );
   }
 
+  //assign commands to relevant label
   for (const [category, cmds] of Object.entries(categories)) {
-    const label = categoryLabels[category] || `📁 ${category}`;
+    const label = categoryLabels[category];
+
     embed.addFields({ name: label, value: cmds.join('\n') });
   }
 
+  //send help message
   await interaction.reply({
     embeds: [embed],
     flags: MessageFlagsBitField.Ephemeral,

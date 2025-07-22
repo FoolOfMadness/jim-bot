@@ -73,6 +73,40 @@ const handValue = (hand) => {
   return value;
 };
 
+//toString for displaying card hands
+const handToString = (hand) => {
+  return hand.map((card) => `${card.value} of ${card.suit}`).join(', ');
+};
+
+//create embed
+const blackJackEmbed = (
+  playerName,
+  playerHand,
+  jimBot,
+  jimHand,
+  hideDealer,
+  avatarURL
+) => {
+  const gameDisplay = hideDealer
+    ? `${handToString([jimHand[0]])} and [Hidden]`
+    : `${handToString(jimHand)} (Value: ${handValue(jimHand)})`;
+
+  return new EmbedBuilder()
+    .setColor('LuminousVividPink')
+    .setTitle('🃏 Blackjack Table 🃏')
+    .addFields(
+      {
+        name: `${playerName}'s hand:`,
+        value: `${handToString(playerHand)} (Value: ${handValue(playerHand)})`,
+      },
+      {
+        name: `${jimBot}'s hand:`,
+        value: gameDisplay,
+      }
+    )
+    .setThumbnail(avatarURL);
+};
+
 //start the game
 export const execute = async (interaction) => {
   await interaction.reply('Game is starting right now!');
@@ -84,7 +118,7 @@ export const execute = async (interaction) => {
   let playerStand = false;
   let gameOver = false;
   const playerName = interaction.member.displayName;
-  const dealerName = interaction.client.user.displayName;
+  const jimBot = interaction.client.user.displayName;
 
   //buttons
   const btnHit = new ButtonBuilder()
@@ -100,18 +134,14 @@ export const execute = async (interaction) => {
   const row = new ActionRowBuilder().addComponents(btnHit, btnStand);
 
   //game embed
-  let embed = new EmbedBuilder()
-    .setColor('LuminousVividPink')
-    .setTitle('🃏 Blackjack Table 🃏')
-    .addFields({
-      name: `${playerName}'s hand:`,
-      value: `${handToString(playerHand)} (Value: ${handValue(playerHand)})`,
-    })
-    .addFields({
-      name: `${dealerName}'s hand:`,
-      value: `${handToString([jimHand[0]])} and [Hidden]`,
-    })
-    .setThumbnail(interaction.member.displayAvatarURL());
+  const embed = blackJackEmbed(
+    playerName,
+    playerHand,
+    jimBot,
+    jimHand,
+    true,
+    avatarURL
+  );
 
   //send embed of blackjack game
   const message = await interaction.followUp({
@@ -130,60 +160,53 @@ export const execute = async (interaction) => {
   //repeat until game is over
   while (!gameOver) {
     //display hands, 1 of JimBot's cards are hidden
-    embed = new EmbedBuilder()
-      .setColor('LuminousVividPink')
-      .setTitle('🃏 Blackjack Table 🃏')
-      .addFields({
-        name: `${playerName}'s hand:`,
-        value: `${handToString(playerHand)} (Value: ${handValue(playerHand)})`,
-      })
-      .addFields({
-        name: `${dealerName}'s hand:`,
-        value: `${handToString([jimHand[0]])} and [Hidden]`,
-      })
-      .setThumbnail(interaction.member.displayAvatarURL());
+    const embed = blackJackEmbed(
+      playerName,
+      playerHand,
+      jimBot,
+      jimHand,
+      true,
+      avatarURL
+    );
 
     await message.edit({ embeds: [embed] });
 
-    //hit or stand
+    //hit or stand logic
     if (!playerStand) {
       let action;
       try {
         action = await message.awaitMessageComponent({
           filter: interactionFilter,
-          time: 120_000, // 2 minute time limit
+          time: 120_000, //2 minute time limit
         });
       } catch (e) {
-        // this happens when we don't receive an interaction within the time limit
-        await message.edit({ components: [] }); // removes the buttons
+        //interaction timeout
+        await message.edit({ components: [] }); //remove buttons
         return interaction.followUp({
           content: 'You ran out of time to play!',
           flags: MessageFlagsBitField.Ephemeral,
-        }); // exit command here
+        }); //exit
       }
+
       //hit
       if (action.customId === 'hit') {
         playerHand.push(deck.pop());
-        //TODO this is ugly, find a better way
-        embed = new EmbedBuilder()
-          .setColor('LuminousVividPink')
-          .setTitle('🃏 Blackjack Table 🃏')
-          .addFields({
-            name: `${playerName}'s hand:`,
-            value: `${handToString(playerHand)} (Value: ${handValue(
-              playerHand
-            )})`,
-          })
-          .addFields({
-            name: `${dealerName}'s hand:`,
-            value: `${handToString([jimHand[0]])} and [Hidden]`,
-          })
-          .setThumbnail(interaction.member.displayAvatarURL());
-        await action.update({ embeds: [embed] });
+        const updatedEmbed = blackJackEmbed(
+          playerName,
+          playerHand,
+          jimBot,
+          jimHand,
+          true,
+          avatarURL
+        );
+        await action.update({ embeds: [updatedEmbed] });
+
+        //bust check
         if (handValue(playerHand) > 21) {
           await interaction.followUp(`Bust! ${playerName} loses.`);
           gameOver = true;
         }
+
         //stand
       } else if (action.customId === 'stand') {
         await action.update({ components: [] });
@@ -194,41 +217,30 @@ export const execute = async (interaction) => {
       while (handValue(jimHand) < 17) {
         jimHand.push(deck.pop());
       }
-      //TODO this is ugly, find a better way
-      embed = new EmbedBuilder()
-        .setColor('LuminousVividPink')
-        .setTitle('🃏 Blackjack Table 🃏')
-        .addFields({
-          name: `${playerName}'s hand:`,
-          value: `${handToString(playerHand)} (Value: ${handValue(
-            playerHand
-          )})`,
-        })
-        .addFields({
-          name: `${dealerName}'s hand:`,
-          value: `${handToString(jimHand)} (Value: ${handValue(jimHand)})`,
-        })
-        .setThumbnail(interaction.member.displayAvatarURL());
-      await message.edit({ embeds: [embed], components: [] });
+      const finalEmbed = blackJackEmbed(
+        playerName,
+        playerHand,
+        jimBot,
+        jimHand,
+        false,
+        avatarURL
+      );
+      await message.edit({ embeds: [finalEmbed], components: [] });
 
       //determine outcome logic
-      if (handValue(jimHand) > 21) {
-        await interaction.followUp(`${dealerName} busts! ${playerName} wins!`);
-      } else if (handValue(jimHand) > handValue(playerHand)) {
-        await interaction.followUp(`${dealerName} wins!`);
-      } else if (handValue(jimHand) < handValue(playerHand)) {
+      const playerTotal = handValue(playerHand);
+      const jimTotal = handValue(jimHand);
+
+      if (jimTotal > 21) {
+        await interaction.followUp(`${jimBot} busts! ${playerName} wins!`);
+      } else if (jimTotal > playerTotal) {
+        await interaction.followUp(`${jimBot} wins!`);
+      } else if (jimTotal < playerTotal) {
         await interaction.followUp(`${playerName} wins!`);
       } else {
-        await interaction.followUp(
-          `It's a draw! ${dealerName} wins by default.`
-        );
+        await interaction.followUp(`It's a draw! ${jimBot} wins by default.`);
       }
       gameOver = true;
     }
   }
-};
-
-//toString for displaying card hands
-const handToString = (hand) => {
-  return hand.map((card) => `${card.value} of ${card.suit}`).join(', ');
 };

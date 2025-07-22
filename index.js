@@ -79,9 +79,6 @@ for (const folder of commandFolders) {
   }
 }
 
-//export commands to help
-export const commands = client.commands;
-
 //load events
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs
