@@ -46,6 +46,9 @@ const responses = [
   "OMG that's crazy!",
   'Okay buddy.',
   "I don't think so pal.",
+  'Perhaps...',
+  'Mayhaps...',
+  '*You* are my buddy 💖',
 ];
 
 //ask the 8ball

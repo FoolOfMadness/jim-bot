@@ -87,6 +87,7 @@ const blackJackEmbed = (
   hideDealer,
   avatarURL
 ) => {
+  //display hands, 1 of JimBot's cards are hidden
   const gameDisplay = hideDealer
     ? `${handToString([jimHand[0]])} and [Hidden]`
     : `${handToString(jimHand)} (Value: ${handValue(jimHand)})`;
@@ -159,7 +160,6 @@ export const execute = async (interaction) => {
 
   //repeat until game is over
   while (!gameOver) {
-    //display hands, 1 of JimBot's cards are hidden
     const embed = blackJackEmbed(
       playerName,
       playerHand,
@@ -191,6 +191,7 @@ export const execute = async (interaction) => {
       //hit
       if (action.customId === 'hit') {
         playerHand.push(deck.pop());
+        //updated embed
         const updatedEmbed = blackJackEmbed(
           playerName,
           playerHand,
@@ -199,6 +200,7 @@ export const execute = async (interaction) => {
           true,
           avatarURL
         );
+        //update embed
         await action.update({ embeds: [updatedEmbed] });
 
         //bust check
@@ -217,6 +219,7 @@ export const execute = async (interaction) => {
       while (handValue(jimHand) < 17) {
         jimHand.push(deck.pop());
       }
+      //final embed
       const finalEmbed = blackJackEmbed(
         playerName,
         playerHand,
@@ -225,6 +228,7 @@ export const execute = async (interaction) => {
         false,
         avatarURL
       );
+      //update with final embed
       await message.edit({ embeds: [finalEmbed], components: [] });
 
       //determine outcome logic
