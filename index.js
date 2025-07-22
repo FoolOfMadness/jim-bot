@@ -56,24 +56,42 @@ client.bannedTable = bannedTable;
 
 //load commands
 const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
-  const commandFiles = fs
-    .readdirSync(commandsPath)
-    .filter((file) => file.endsWith('.js'));
+//check file is truly a folder
+const commandEntries = fs.readdirSync(foldersPath);
 
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const commandModule = await import(`file://${filePath}`);
+for (const entry of commandEntries) {
+  const fullPath = path.join(foldersPath, entry);
+
+  if (fs.statSync(fullPath).isDirectory()) {
+    //load commands from inside category folder
+    const commandFiles = fs
+      .readdirSync(fullPath)
+      .filter((file) => file.endsWith('.js'));
+
+    for (const file of commandFiles) {
+      const filePath = path.join(fullPath, file);
+      const commandModule = await import(`file://${filePath}`);
+
+      if ('data' in commandModule && 'execute' in commandModule) {
+        const commandWithCategory = { ...commandModule, category: entry }; //folder name as category
+        client.commands.set(commandModule.data.name, commandWithCategory);
+      } else {
+        console.warn(
+          `[WARNING] The command at ${filePath} is missing "data" or "execute".`
+        );
+      }
+    }
+  } else if (entry.endsWith('.js')) {
+    //direct command file in commands directory
+    const commandModule = await import(`file://${fullPath}`);
 
     if ('data' in commandModule && 'execute' in commandModule) {
-      const commandWithCategory = { ...commandModule, category: folder };
+      const commandWithCategory = { ...commandModule, category: 'misc' }; //label as misc
       client.commands.set(commandModule.data.name, commandWithCategory);
     } else {
       console.warn(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" export.`
+        `[WARNING] The command at ${fullPath} is missing "data" or "execute".`
       );
     }
   }

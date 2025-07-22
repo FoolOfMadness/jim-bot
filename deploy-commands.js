@@ -3,7 +3,7 @@ import 'dotenv/config';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { REST, Routes } from 'discord.js';
-import { readdirSync } from 'node:fs';
+import { readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,22 +31,36 @@ if (argv.deploy) {
 //load commands
 const commands = [];
 const foldersPath = join(__dirname, 'commands');
-const commandFolders = readdirSync(foldersPath);
+const commandEntries = readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-  const commandsPath = join(foldersPath, folder);
-  const commandFiles = readdirSync(commandsPath).filter((file) =>
-    file.endsWith('.js')
-  );
+for (const entry of commandEntries) {
+  const fullPath = join(foldersPath, entry);
 
-  for (const file of commandFiles) {
-    const filePath = join(commandsPath, file);
-    const command = await import(`file://${filePath}`);
+  if (statSync(fullPath).isDirectory()) {
+    //if file is folder, load commands in directory
+    const commandFiles = readdirSync(fullPath).filter((file) =>
+      file.endsWith('.js')
+    );
+
+    for (const file of commandFiles) {
+      const filePath = join(fullPath, file);
+      const command = await import(`file://${filePath}`);
+      if ('data' in command && 'execute' in command) {
+        commands.push(command.data.toJSON());
+      } else {
+        console.warn(
+          `[WARNING] The command at ${filePath} is missing "data" or "execute".`
+        );
+      }
+    }
+  } else if (entry.endsWith('.js')) {
+    //if file is command, load directly
+    const command = await import(`file://${fullPath}`);
     if ('data' in command && 'execute' in command) {
       commands.push(command.data.toJSON());
     } else {
       console.warn(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+        `[WARNING] The command at ${fullPath} is missing "data" or "execute".`
       );
     }
   }

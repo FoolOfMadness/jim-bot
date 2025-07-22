@@ -7,11 +7,13 @@ export const data = new SlashCommandBuilder()
   .setDescription('Replies with Pong!');
 
 export const execute = async (interaction) => {
-  const sent = await interaction.reply({
+  await interaction.reply({
     content: 'Pinging...',
-    fetchReply: true,
   });
-  interaction.editReply(
+
+  const sent = await interaction.fetchReply();
+
+  await interaction.editReply(
     `Roundtrip latency: ${
       sent.createdTimestamp - interaction.createdTimestamp
     }ms`
