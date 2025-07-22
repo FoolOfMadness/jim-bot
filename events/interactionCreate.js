@@ -1,5 +1,5 @@
 //interact with given command
-import { Events, Collection } from 'discord.js';
+import { Events, Collection, MessageFlagsBitField } from 'discord.js';
 
 export const name = Events.InteractionCreate;
 export async function execute(interaction) {
@@ -31,7 +31,7 @@ export async function execute(interaction) {
       const expiredTimestamp = Math.round(expirationTime / 1000);
       return interaction.reply({
         content: `Please wait, you are on cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
     }
   }
@@ -46,12 +46,12 @@ export async function execute(interaction) {
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: 'There was an error while executing this command!',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
     } else {
       await interaction.reply({
         content: 'There was an error while executing this command!',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
     }
   }

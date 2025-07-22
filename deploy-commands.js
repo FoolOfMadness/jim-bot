@@ -41,7 +41,7 @@ for (const folder of commandFolders) {
 
   for (const file of commandFiles) {
     const filePath = join(commandsPath, file);
-    const { default: command } = await import(`file://${filePath}`);
+    const command = await import(`file://${filePath}`);
     if ('data' in command && 'execute' in command) {
       commands.push(command.data.toJSON());
     } else {

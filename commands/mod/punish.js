@@ -370,3 +370,5 @@ export const execute = async (interaction) => {
     await interaction.editReply('Firing Destroy Beam!');
   }
 };
+
+export { extremePunish };

@@ -1,7 +1,11 @@
 //red & blue truth umineko command
 import { createCanvas, loadImage } from 'canvas';
 import { join } from 'node:path';
-import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  AttachmentBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -90,7 +94,7 @@ export const execute = async (interaction) => {
     console.error(error);
     return interaction.followUp({
       content: 'Something went wrong, whoops.',
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   }
 };

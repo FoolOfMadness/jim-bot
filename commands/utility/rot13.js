@@ -1,5 +1,5 @@
 //cipher (ROT13) command
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -33,13 +33,13 @@ export const execute = async (interaction) => {
     //give result
     await interaction.reply({
       content: `🔒 **ROT13 Result:**\n${result}`,
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while processing the message...',
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   }
 };

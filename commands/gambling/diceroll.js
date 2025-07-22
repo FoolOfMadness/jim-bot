@@ -1,6 +1,10 @@
 //diceroll command
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { toWords } from 'number-to-words';
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
+import numberToWords from 'number-to-words';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -46,7 +50,7 @@ export const execute = async (interaction) => {
     if (sides < 3 || sides > 100) {
       await interaction.reply({
         content: 'Please enter a valid number of sides between 3 and 100!',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
       return;
     }
@@ -55,7 +59,7 @@ export const execute = async (interaction) => {
     if (quantity <= 0 || quantity > 100) {
       await interaction.reply({
         content: 'Please enter a valid number of dice between 1 and 100!',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
       return;
     }
@@ -64,7 +68,7 @@ export const execute = async (interaction) => {
     if (modifier < -50 || modifier > 50) {
       await interaction.reply({
         content: 'Please enter a modifier between -50 and +50!',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
       return;
     }
@@ -84,7 +88,7 @@ export const execute = async (interaction) => {
     const resultText = quantity === 1 ? 'result' : 'results';
 
     //convert quantity to words
-    const quantityWords = toWords(quantity);
+    const quantityWords = numberToWords.toWords(quantity);
 
     //make an embed with the results
     const embed = new EmbedBuilder()
@@ -151,7 +155,7 @@ export const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while rolling the dice...',
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   }
 };

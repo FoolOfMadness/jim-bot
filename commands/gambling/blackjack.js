@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  MessageFlagsBitField,
 } from 'discord.js';
 
 //name of slash command & description
@@ -157,7 +158,7 @@ export const execute = async (interaction) => {
         await message.edit({ components: [] }); // removes the buttons
         return interaction.followUp({
           content: 'You ran out of time to play!',
-          flags: MessageFlags.Ephemeral,
+          flags: MessageFlagsBitField.Ephemeral,
         }); // exit command here
       }
       //hit
@@ -180,9 +181,7 @@ export const execute = async (interaction) => {
           .setThumbnail(interaction.member.displayAvatarURL());
         await action.update({ embeds: [embed] });
         if (handValue(playerHand) > 21) {
-          await interaction.followUp(
-            `Bust! <:derplei:1254435482108956782> ${playerName} loses. <:smuglei:1271465346439708742>`
-          );
+          await interaction.followUp(`Bust! ${playerName} loses.`);
           gameOver = true;
         }
         //stand

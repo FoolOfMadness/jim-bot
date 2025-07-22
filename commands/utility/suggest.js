@@ -1,5 +1,9 @@
 //suggestion command
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -63,13 +67,13 @@ export const execute = async (interaction) => {
     //reply to the user
     await interaction.reply({
       content: 'Your suggestion has been sent successfully!',
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while sending your suggestion...',
-      flags: MessageFlags.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   }
 };

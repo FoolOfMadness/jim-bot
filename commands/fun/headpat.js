@@ -2,7 +2,16 @@
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
 import { join } from 'node:path';
-import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  AttachmentBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -63,7 +72,7 @@ export const execute = async (interaction) => {
       console.error(error);
       return interaction.followUp({
         content: 'Something went wrong, whoops.',
-        flags: MessageFlags.Ephemeral,
+        flags: MessageFlagsBitField.Ephemeral,
       });
     });
 };

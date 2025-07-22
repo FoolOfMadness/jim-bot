@@ -1,6 +1,9 @@
 //help command to explain other JimBot commands
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { commands } from '../../index.js';
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
 
 const categoryLabels = {
   fun: '🎉 Fun Commands 🎈',
@@ -16,6 +19,8 @@ export const data = new SlashCommandBuilder()
   .setDescription("Provides information about JimBot's commands.");
 
 export const execute = async (interaction) => {
+  const commands = interaction.client.commands;
+
   const embed = new EmbedBuilder()
     .setColor('#00a693')
     .setTitle('🧙‍♂️ JimBot Command List 🤖')
@@ -36,5 +41,8 @@ export const execute = async (interaction) => {
     embed.addFields({ name: label, value: cmds.join('\n') });
   }
 
-  await interaction.reply({ embeds: [embed], ephemeral: true });
+  await interaction.reply({
+    embeds: [embed],
+    flags: MessageFlagsBitField.Ephemeral,
+  });
 };
