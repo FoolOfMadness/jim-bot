@@ -9,9 +9,9 @@ import {
 const categoryLabels = {
   fun: '🎉 Fun Commands 🎈',
   gambling: '🃏 Gambling Commands 🎲',
-  utility: '🔧 Utility Commands 🕰️',
-  mod: '🛠️ Mod Tools 🔐',
   misc: '📦 Miscellaneous',
+  mod: '🛠️ Mod Tools 🔐',
+  utility: '🔧 Utility Commands 🕰️',
 };
 
 //name of slash command & description

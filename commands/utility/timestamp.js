@@ -84,7 +84,7 @@ const sortedTimezones = [
 ];
 
 //autocomplete options for timezone
-const autocomplete = async (interaction) => {
+export const autocomplete = async (interaction) => {
   const focusedOption = interaction.options.getFocused(true);
 
   if (focusedOption.name === 'timezone') {

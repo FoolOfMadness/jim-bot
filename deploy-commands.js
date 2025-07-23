@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 //parse CLI arguments
 const argv = yargs(hideBin(process.argv)).parse();
 
-// load environment variables
+//load environment variables
 const token = process.env.TOKEN;
 const clientId = process.env.CLIENT_ID;
 let guildId;
