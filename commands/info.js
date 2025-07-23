@@ -1,5 +1,5 @@
 //info command
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -24,13 +24,15 @@ export const execute = async (interaction) => {
     if (user) {
       await interaction.reply(`Username: ${user.username}\nID: ${user.id}`);
     } else {
-      await interaction.reply(
-        `Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`
-      );
+      await interaction.reply({
+        content: `Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`,
+        flags: MessageFlagsBitField.Ephemeral,
+      });
     }
   } else if (interaction.options.getSubcommand() === 'server') {
-    await interaction.reply(
-      `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
-    );
+    await interaction.reply({
+      content: `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`,
+      flags: MessageFlagsBitField.Ephemeral,
+    });
   }
 };

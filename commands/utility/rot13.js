@@ -13,13 +13,10 @@ export const data = new SlashCommandBuilder()
   );
 
 //ROT13 encoding/decoding
-const rot13 = (str) => {
-  return str.replace(/[A-Za-z]/g, (c) =>
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.charAt(
-      'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'.indexOf(c)
-    )
+const rot13 = (str) =>
+  str.replace(/[a-zA-Z]/g, (c) =>
+    String.fromCharCode(c.charCodeAt(0) + (c.toLowerCase() < 'n' ? 13 : -13))
   );
-};
 
 //cipher the text
 export const execute = async (interaction) => {

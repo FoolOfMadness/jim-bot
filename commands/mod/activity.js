@@ -36,9 +36,10 @@ export const execute = async (interaction) => {
       content: "You're not Jim. You will never be Jim.",
       flags: MessageFlagsBitField.Ephemeral,
     });
+    return;
   }
 
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
 
   //define activity type
   let activity_type = interaction.options.getString('type');

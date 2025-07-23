@@ -113,6 +113,7 @@ export const execute = async (interaction) => {
   await interaction.reply('Game is starting right now!');
 
   //declare variables
+  const avatarURL = interaction.user.displayAvatarURL();
   let deck = shuffleDeck(createDeck());
   let playerHand = [deck.pop(), deck.pop()];
   let jimHand = [deck.pop(), deck.pop()];

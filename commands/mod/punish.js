@@ -7,6 +7,7 @@ import {
   ActionRowBuilder,
   ComponentType,
   EmbedBuilder,
+  MessageFlagsBitField,
 } from 'discord.js';
 import { chooseWithProbabilities } from '../../randomUtil.js';
 import { gomenasorry } from '../fun/gomenasorry.js';
@@ -123,6 +124,7 @@ const extremePunish = async (channel, target, duration, timeInSeconds) => {
   const chunkSize = 5;
   for (let i = 0; i < buttons.length; i += chunkSize) {
     const chunk = buttons.slice(i, i + chunkSize);
+    if (chunk.length === 0) continue;
     const row = new ActionRowBuilder().addComponents(...chunk);
     rows.push(row);
   }
@@ -225,7 +227,7 @@ export const execute = async (interaction) => {
   const timeout_duration =
     (interaction.options.getInteger('duration') ?? 60) * 1000;
   if (interaction.options.getSubcommand() === 'many') {
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply({});
     const targets = [];
 
     for (let i = 1; i < 6; i++) {
@@ -303,7 +305,7 @@ export const execute = async (interaction) => {
         });
       });
   } else if (interaction.options.getSubcommand() === 'one') {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
     const target = interaction.options.getMember('target');
 
     //check if can timeout user
@@ -358,7 +360,7 @@ export const execute = async (interaction) => {
     //reply message when command starts
     await interaction.editReply("It's done, boss.");
   } else if (interaction.options.getSubcommand() == 'extreme') {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
     const target = interaction.options.getMember('target');
     const timeInSeconds = interaction.options.getInteger('time') ?? 150;
     await extremePunish(

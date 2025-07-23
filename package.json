@@ -12,6 +12,7 @@
   "author": "Jim Bool",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/rest": "^1.6.0",
     "canvas": "^2.11.2",
     "canvas-gif": "^1.0.3",
     "discord.js": "^14.21.0",

@@ -2,10 +2,11 @@
 import 'dotenv/config';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
-import { REST, Routes } from 'discord.js';
 import { readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v10';
 
 //resolve __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -67,7 +68,7 @@ for (const entry of commandEntries) {
 }
 
 //deploy commands
-const rest = new REST().setToken(token);
+const rest = new REST({ version: '10' }).setToken(token);
 
 try {
   console.log(deploymentMessage);

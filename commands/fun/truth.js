@@ -1,11 +1,15 @@
 //red & blue truth umineko command
 import { createCanvas, loadImage } from 'canvas';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import {
   SlashCommandBuilder,
   AttachmentBuilder,
   MessageFlagsBitField,
 } from 'discord.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
