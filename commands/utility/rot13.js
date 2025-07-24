@@ -1,5 +1,10 @@
 //cipher (ROT13) command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  MessageFlagsBitField,
+  ContextMenuCommandBuilder,
+  ApplicationCommandType,
+} from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -12,6 +17,11 @@ export const data = new SlashCommandBuilder()
       .setRequired(true)
   );
 
+//context menu command
+export const contextMenuData = new ContextMenuCommandBuilder()
+  .setName('ROT13 Encode/Decode')
+  .setType(ApplicationCommandType.Message);
+
 //ROT13 encoding/decoding
 const rot13 = (str) =>
   str.replace(/[a-zA-Z]/g, (c) =>
@@ -21,8 +31,21 @@ const rot13 = (str) =>
 //cipher the text
 export const execute = async (interaction) => {
   try {
-    //get the user input
-    const message = interaction.options.getString('message');
+    let message;
+    //slash command
+    if (interaction.isChatInputCommand()) {
+      message = interaction.options.getString('message');
+      //context menu command
+    } else if (interaction.isMessageContextMenuCommand()) {
+      message = interaction.targetMessage.content;
+    }
+    //no message content
+    if (!message) {
+      return await interaction.reply({
+        content: 'No message content found to encode/decode.',
+        flags: MessageFlagsBitField.Ephemeral,
+      });
+    }
 
     //put message through cipher
     const result = rot13(message);
