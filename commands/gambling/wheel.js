@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
 } from 'discord.js';
 import { createCanvas } from 'canvas';
+import raf from 'raf';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -29,7 +30,6 @@ export const data = new SlashCommandBuilder()
 
 //spin the wheel
 export const execute = async (interaction) => {
-  //get user input
   const input = interaction.options.getString('options');
   const colourInput = interaction.options.getString('colours') || '';
 
@@ -53,13 +53,12 @@ export const execute = async (interaction) => {
   //create canvas
   const canvas = createCanvas(500, 500);
   const ctx = canvas.getContext('2d');
-  drawWheel(ctx, segments, colours);
+
+  //select winner when wheel is finished spinning
+  const result = await spinWheel(ctx, canvas, segments, colours);
 
   const buffer = canvas.toBuffer('image/png');
   const attachment = new AttachmentBuilder(buffer, { name: 'wheel.png' });
-
-  //select random
-  const result = segments[Math.floor(Math.random() * segments.length)];
 
   //embed message
   const embed = new EmbedBuilder()
@@ -73,8 +72,7 @@ export const execute = async (interaction) => {
 };
 
 //function to create the wheel
-function drawWheel(ctx, segments, colours = []) {
-  //set size
+function drawWheel(ctx, segments, colours = [], rotation = 0) {
   const canvasSize = 500;
   const centerX = canvasSize / 2;
   const centerY = canvasSize / 2;
@@ -85,7 +83,7 @@ function drawWheel(ctx, segments, colours = []) {
 
   //create segments for each input option
   segments.forEach((label, i) => {
-    const angle = i * arc;
+    const angle = i * arc + rotation;
     const colour =
       colours[i] || `hsl(${(i * 360) / segments.length}, 100%, 50%)`;
     ctx.fillStyle = colour;
@@ -113,4 +111,30 @@ function drawWheel(ctx, segments, colours = []) {
   ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
   ctx.fillStyle = 'black';
   ctx.fill();
+}
+
+//function to spin the wheel
+function spinWheel(ctx, canvas, segments, colours) {
+  return new Promise((resolve) => {
+    let rotation = 0;
+    let speed = 0.3;
+    let deceleration = 0.005;
+
+    function animate() {
+      drawWheel(ctx, segments, colours, rotation);
+      rotation += speed;
+      speed -= deceleration;
+
+      if (speed <= 0) {
+        const arc = (2 * Math.PI) / segments.length;
+        const index = Math.floor(
+          ((2 * Math.PI - (rotation % (2 * Math.PI))) % (2 * Math.PI)) / arc
+        );
+        resolve(segments[index]);
+      } else {
+        raf(animate);
+      }
+    }
+    animate();
+  });
 }
