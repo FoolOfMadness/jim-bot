@@ -15,7 +15,7 @@ import { gomenasorry } from '../fun/gomenasorry.js';
 //name of slash commands, subcommands, & descriptions
 export const data = new SlashCommandBuilder()
   .setName('punish')
-  .setDescription('Punish a disobedient buddy.')
+  .setDescription('Punish a disobedient buddy')
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addSubcommand((subcommand) =>
     subcommand
@@ -358,7 +358,7 @@ export const execute = async (interaction) => {
       });
 
     //reply message when command starts
-    await interaction.editReply("It's done, boss.");
+    await interaction.editReply("It's done, buddy.");
   } else if (interaction.options.getSubcommand() == 'extreme') {
     await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
     const target = interaction.options.getMember('target');

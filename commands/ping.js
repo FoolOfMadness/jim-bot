@@ -4,7 +4,7 @@ import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('ping')
-  .setDescription('Replies with Pong!');
+  .setDescription('Replies with Pong');
 
 const cooldown = new Set();
 const cooldownTime = 5000;

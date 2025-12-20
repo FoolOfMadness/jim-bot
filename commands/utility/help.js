@@ -17,7 +17,7 @@ const categoryLabels = {
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('help')
-  .setDescription("Provides information about JimBot's commands.");
+  .setDescription("Provides information about JimBot's commands");
 
 export const execute = async (interaction) => {
   //get list of commands

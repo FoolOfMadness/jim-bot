@@ -10,7 +10,7 @@ import GIFEncoder from 'gifencoder';
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('wheel')
-  .setDescription('Spin a custom wheel!')
+  .setDescription('Spin a custom wheel')
   .addStringOption((option) =>
     option
       .setName('options')
