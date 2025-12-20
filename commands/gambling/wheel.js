@@ -3,6 +3,7 @@ import {
   SlashCommandBuilder,
   AttachmentBuilder,
   EmbedBuilder,
+  MessageFlagsBitField,
 } from 'discord.js';
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
@@ -50,7 +51,7 @@ export const execute = async (interaction) => {
   if (segments.length < 2) {
     return interaction.reply({
       content: 'Please provide at least two options.',
-      ephemeral: true,
+      flags: MessageFlagsBitField.Ephemeral,
     });
   }
 
