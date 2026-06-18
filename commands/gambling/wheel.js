@@ -8,6 +8,25 @@ import {
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
 
+//config variables
+const WHEEL_SIZE = 400;
+const WHEEL_PADDING = 10;
+const POINTER_SIZE = 15;
+const CENTER_DOT_SIZE = 10;
+
+const GIF_FPS = 15;
+const GIF_TOTAL_FRAMES = 45;
+const GIF_QUALITY = 15;
+
+const MAX_SEGMENTS = 20;
+const MAX_LABEL_LENGTH = 24;
+
+//prevents simultaneous gif renders
+let isRenderingGif = false;
+
+//single tiny canvas for colour validation/parsing
+const colourParseCtx = createCanvas(1, 1).getContext('2d');
+
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('wheel')
@@ -31,6 +50,14 @@ export const data = new SlashCommandBuilder()
 
 //spin the wheel
 export const execute = async (interaction) => {
+  //gif lock check
+  if (isRenderingGif) {
+    return interaction.reply({
+      content: "I'm already spinning, give me a minute.",
+      flags: MessageFlagsBitField.Ephemeral,
+    });
+  }
+
   const input = interaction.options.getString('options');
   const colourInput = interaction.options.getString('colours') || '';
 
@@ -38,13 +65,9 @@ export const execute = async (interaction) => {
   const segments = input
     .split(',')
     .map((s) => s.trim())
-    .filter(Boolean);
-  const colours = colourInput
-    .split(',')
-    .map((c, i) => c.trim())
     .filter(Boolean)
-    .map((c, i) =>
-      isValidColor(c) ? c : `hsl(${(i * 360) / segments.length}, 100%, 50%)`
+    .map((s) =>
+      s.length > MAX_LABEL_LENGTH ? `${s.slice(0, MAX_LABEL_LENGTH)}...` : s
     );
 
   //ensure more than 2 options
@@ -54,36 +77,92 @@ export const execute = async (interaction) => {
       flags: MessageFlagsBitField.Ephemeral,
     });
   }
+  //ensure less than max
+  if (segments.length > MAX_SEGMENTS) {
+    return interaction.reply({
+      content: `Please provide ${MAX_SEGMENTS} options or fewer.`,
+      flags: MessageFlagsBitField.Ephemeral,
+    });
+  }
 
-  await interaction.deferReply(); //prevent timeout
+  //gif lock on
+  isRenderingGif = true;
 
-  //create canvas
-  const canvas = createCanvas(500, 500);
-  const ctx = canvas.getContext('2d');
+  await interaction.deferReply();
 
-  //select winner when wheel is finished spinning
-  const { winner, buffer } = await spinWheel(ctx, canvas, segments, colours);
+  try {
+    const colourInputs = colourInput
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
 
-  const attachment = new AttachmentBuilder(buffer, { name: 'wheel.gif' });
+    const segmentData = buildSegmentData(segments, colourInputs);
 
-  //embed message
-  const embed = new EmbedBuilder()
-    .setTitle('🎡 Spinning the Wheel!')
-    .setDescription(`The wheel has spoken... **${winner}**!`)
-    .setColor(0x00ae86)
-    .setImage('attachment://wheel.gif')
-    .setTimestamp();
+    //create canvas
+    const canvas = createCanvas(WHEEL_SIZE, WHEEL_SIZE);
+    const ctx = canvas.getContext('2d');
 
-  await interaction.editReply({ embeds: [embed], files: [attachment] });
+    //select winner when wheel is finished spinning
+    const { winner, buffer } = await spinWheel(ctx, canvas, segmentData);
+
+    const attachment = new AttachmentBuilder(buffer, {
+      name: 'wheel.gif',
+    });
+
+    //embed message
+    const embed = new EmbedBuilder()
+      .setTitle('🎡 Spinning the Wheel!')
+      .setDescription(`The wheel has spoken... **${winner}**!`)
+      .setColor(0x00ae86)
+      .setImage('attachment://wheel.gif')
+      .setTimestamp();
+
+    return interaction.editReply({
+      embeds: [embed],
+      files: [attachment],
+    });
+  } catch (error) {
+    console.error('Wheel command failed:', error);
+
+    return interaction.editReply({
+      content: 'Something went wrong while spinning the wheel...',
+    });
+  } finally {
+    //gif lock off
+    isRenderingGif = false;
+  }
 };
 
+//build segment data once so it does not recalculate every frame
+function buildSegmentData(segments, colourInputs) {
+  return segments.map((label, index) => {
+    const fallbackColour = `hsl(${(index * 360) / segments.length}, 100%, 50%)`;
+    const inputColour = colourInputs[index];
+
+    const colour =
+      inputColour && isValidColor(inputColour)
+        ? normaliseColour(inputColour)
+        : fallbackColour;
+
+    const rgb = colourToRgb(colour);
+    const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+    const textColour = brightness > 128 ? 'black' : 'white';
+
+    return {
+      label,
+      colour,
+      textColour,
+    };
+  });
+}
+
 //function to create the wheel
-function drawWheel(ctx, segments, colours = [], rotation = 0) {
-  const canvasSize = 500;
+function drawWheel(ctx, segmentData, rotation = 0) {
+  const canvasSize = WHEEL_SIZE;
   const centerX = canvasSize / 2;
   const centerY = canvasSize / 2;
-  const radius = canvasSize / 2 - 10;
-  const arc = (2 * Math.PI) / segments.length;
+  const radius = canvasSize / 2 - WHEEL_PADDING;
+  const arc = (2 * Math.PI) / segmentData.length;
 
   //solid background
   ctx.fillStyle = '#ffffff';
@@ -96,11 +175,10 @@ function drawWheel(ctx, segments, colours = [], rotation = 0) {
   ctx.translate(-centerX, -centerY);
 
   //create segments for each input option
-  segments.forEach((label, i) => {
+  segmentData.forEach((segment, i) => {
     const angle = i * arc;
-    const colour =
-      colours[i] || `hsl(${(i * 360) / segments.length}, 100%, 50%)`;
-    ctx.fillStyle = colour;
+
+    ctx.fillStyle = segment.colour;
 
     //draw segment
     ctx.beginPath();
@@ -111,149 +189,179 @@ function drawWheel(ctx, segments, colours = [], rotation = 0) {
 
     //draw text
     ctx.save();
+
     const textAngle = angle + arc / 2;
+    const textDistance = radius * 0.65;
+
     ctx.translate(
-      centerX + Math.cos(textAngle) * (radius * 0.65),
-      centerY + Math.sin(textAngle) * (radius * 0.65)
+      centerX + Math.cos(textAngle) * textDistance,
+      centerY + Math.sin(textAngle) * textDistance
     );
+
     ctx.rotate(textAngle);
 
-    //dynamic text color
-    const rgb = hexToRgb(colour);
-    const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-    ctx.fillStyle = brightness > 128 ? 'black' : 'white';
+    ctx.fillStyle = segment.textColour;
+    ctx.font = 'bold 15px Arial';
+    ctx.textBaseline = 'middle';
 
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(label, -ctx.measureText(label).width / 2, 0);
+    const textWidth = ctx.measureText(segment.label).width;
+    ctx.fillText(segment.label, -textWidth / 2, 0);
+
     ctx.restore();
   });
 
-  ctx.restore(); //reset rotation
+  ctx.restore();
 
   //draw the pointer
   ctx.save();
-  ctx.translate(centerX + radius, centerY); //right edge of wheel
+  ctx.translate(centerX + radius, centerY);
 
   ctx.beginPath();
-  ctx.moveTo(0, -15); //tip of pointer
-  ctx.lineTo(30, 0); //back bottom corner
-  ctx.lineTo(0, 15); //back top corner
+  ctx.moveTo(0, -POINTER_SIZE);
+  ctx.lineTo(POINTER_SIZE * 2, 0);
+  ctx.lineTo(0, POINTER_SIZE);
   ctx.closePath();
 
-  ctx.fillStyle = 'red'; //fill with red
+  ctx.fillStyle = 'red';
   ctx.fill();
 
-  ctx.lineWidth = 3; //outline width
-  ctx.strokeStyle = 'black'; //black outline
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'black';
   ctx.stroke();
 
   ctx.restore();
 
   //draw center dot
   ctx.beginPath();
-  ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+  ctx.arc(centerX, centerY, CENTER_DOT_SIZE, 0, 2 * Math.PI);
   ctx.fillStyle = 'black';
   ctx.fill();
 }
 
 //spin the wheel and generate GIF
-function spinWheel(ctx, canvas, segments, colours) {
-  return new Promise((resolve) => {
+function spinWheel(ctx, canvas, segmentData) {
+  return new Promise((resolve, reject) => {
     const canvasSize = canvas.width;
     const encoder = new GIFEncoder(canvasSize, canvasSize);
-    encoder.start();
-    encoder.setRepeat(-1); //play once
-    encoder.setDelay(40); //~25 FPS
-    encoder.setQuality(10);
-    encoder.setTransparent(true);
 
     const stream = encoder.createReadStream();
     const chunks = [];
+
+    let finalRotation = 0;
+
     stream.on('data', (chunk) => chunks.push(chunk));
+
     stream.on('end', () => {
       const buffer = Buffer.concat(chunks);
-      const arc = (2 * Math.PI) / segments.length;
+      const arc = (2 * Math.PI) / segmentData.length;
+
       const index = Math.floor(
         ((((0 - finalRotation) % (2 * Math.PI)) + 2 * Math.PI) %
           (2 * Math.PI)) /
           arc
       );
-      resolve({ winner: segments[index], buffer });
+
+      resolve({
+        winner: segmentData[index].label,
+        buffer,
+      });
     });
 
+    stream.on('error', reject);
+
+    encoder.start();
+    encoder.setRepeat(-1); //play once
+    encoder.setDelay(Math.round(1000 / GIF_FPS));
+    encoder.setQuality(GIF_QUALITY);
+
     //spin logic
-    const totalFrames = 60;
-    let currentFrame = 0;
     const startRotation = 0;
     const maxRotation = Math.PI * 6 + Math.random() * Math.PI * 2;
-    let finalRotation = 0;
 
-    function animate() {
-      if (currentFrame < totalFrames) {
-        const t = currentFrame / totalFrames;
+    try {
+      for (
+        let currentFrame = 0;
+        currentFrame < GIF_TOTAL_FRAMES;
+        currentFrame++
+      ) {
+        const t = currentFrame / GIF_TOTAL_FRAMES;
         const easedSpeed = 1 - Math.pow(1 - t, 3); //easeOutCubic
         const rotation = startRotation + maxRotation * easedSpeed;
+
         finalRotation = rotation;
 
-        drawWheel(ctx, segments, colours, rotation);
+        drawWheel(ctx, segmentData, rotation);
         encoder.addFrame(ctx);
-        currentFrame++;
-        setImmediate(animate);
-      } else {
-        encoder.finish();
       }
-    }
 
-    animate();
+      encoder.finish();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
+//colour check
 function isValidColor(color) {
-  const ctx = createCanvas(1, 1).getContext('2d');
   try {
-    ctx.fillStyle = color;
-    return true;
+    colourParseCtx.fillStyle = '#ffffff';
+    colourParseCtx.fillStyle = color;
+
+    return (
+      colourParseCtx.fillStyle !== '#ffffff' ||
+      color.toLowerCase() === '#ffffff' ||
+      color.toLowerCase() === 'white'
+    );
   } catch {
     return false;
   }
 }
 
+function normaliseColour(color) {
+  colourParseCtx.fillStyle = '#ffffff';
+  colourParseCtx.fillStyle = color;
+
+  return colourParseCtx.fillStyle;
+}
+
 //convert colour to RGB for brightness calculation
-function hexToRgb(color) {
+function colourToRgb(color) {
   try {
-    const ctx = createCanvas(1, 1).getContext('2d');
-    ctx.fillStyle = '#ffffff'; //fallback
-    ctx.fillStyle = color;
-    const computed = ctx.fillStyle;
+    colourParseCtx.fillStyle = '#ffffff';
+    colourParseCtx.fillStyle = color;
+
+    const computed = colourParseCtx.fillStyle;
 
     if (computed.startsWith('#')) {
       const hex = computed.replace('#', '');
-      let r, g, b;
 
       if (hex.length === 3) {
-        r = parseInt(hex[0] + hex[0], 16);
-        g = parseInt(hex[1] + hex[1], 16);
-        b = parseInt(hex[2] + hex[2], 16);
-      } else if (hex.length === 6) {
-        r = parseInt(hex.substring(0, 2), 16);
-        g = parseInt(hex.substring(2, 4), 16);
-        b = parseInt(hex.substring(4, 6), 16);
+        return {
+          r: parseInt(hex[0] + hex[0], 16),
+          g: parseInt(hex[1] + hex[1], 16),
+          b: parseInt(hex[2] + hex[2], 16),
+        };
       }
 
-      return { r, g, b };
+      if (hex.length === 6) {
+        return {
+          r: parseInt(hex.substring(0, 2), 16),
+          g: parseInt(hex.substring(2, 4), 16),
+          b: parseInt(hex.substring(4, 6), 16),
+        };
+      }
     }
 
-    //if canvas parsed into rgb string, extract those values
     if (computed.startsWith('rgb')) {
       const [r, g, b] = computed
         .replace(/[^\d,]/g, '')
         .split(',')
         .map(Number);
+
       return { r, g, b };
     }
-  } catch (err) {
-    //fallback in case of any parsing error
+  } catch {
+    //fallback below
   }
-
-  return { r: 255, g: 255, b: 255 }; //default: white
+  return { r: 255, g: 255, b: 255 };
 }

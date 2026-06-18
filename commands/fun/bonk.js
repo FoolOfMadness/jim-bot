@@ -35,6 +35,7 @@ export const data = new SlashCommandBuilder()
 
 //adds user's profile pic to canvas
 export const execute = async (interaction) => {
+  //gif lock check
   if (isRenderingGif) {
     return interaction.reply({
       content: "I'm already bonking someone, give me a minute.",
@@ -125,8 +126,8 @@ export const execute = async (interaction) => {
       content: 'Something went wrong, whoops.',
       flags: MessageFlagsBitField.Ephemeral,
     });
-    //gif lock off
   } finally {
+    //gif lock off
     isRenderingGif = false;
   }
 };
