@@ -1,0 +1,253 @@
+//weather command
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlagsBitField,
+} from 'discord.js';
+
+//name of slash command & description
+export const data = new SlashCommandBuilder()
+  .setName('weather')
+  .setDescription('Get weather for your area privately')
+  .addStringOption((option) =>
+    option
+      .setName('location')
+      .setDescription('City, town, or postcode. This will be hidden.')
+      .setRequired(true)
+  )
+  .addBooleanOption((option) =>
+    option
+      .setName('public')
+      .setDescription('Post a generic weather result publicly? Default: false')
+      .setRequired(false)
+  );
+
+//api function call location
+async function geocodeLocation(location) {
+  const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
+
+  url.searchParams.set('name', location);
+  url.searchParams.set('count', '1');
+  url.searchParams.set('language', 'en');
+  url.searchParams.set('format', 'json');
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Geocoding failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.results || data.results.length === 0) {
+    return null;
+  }
+
+  return data.results[0];
+}
+
+//api function call lat-long
+async function getWeather(latitude, longitude) {
+  const url = new URL('https://api.open-meteo.com/v1/forecast');
+
+  url.searchParams.set('latitude', latitude);
+  url.searchParams.set('longitude', longitude);
+  url.searchParams.set(
+    'current',
+    [
+      'temperature_2m',
+      'relative_humidity_2m',
+      'apparent_temperature',
+      'precipitation',
+      'weather_code',
+      'wind_speed_10m',
+    ].join(',')
+  );
+  url.searchParams.set('timezone', 'auto');
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Weather fetch failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return data.current;
+}
+
+//weather codes to text
+function weatherCodeToText(code) {
+  const codes = {
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Fog',
+    48: 'Depositing rime fog',
+    51: 'Light drizzle',
+    53: 'Moderate drizzle',
+    55: 'Dense drizzle',
+    56: 'Light freezing drizzle',
+    57: 'Dense freezing drizzle',
+    61: 'Slight rain',
+    63: 'Moderate rain',
+    65: 'Heavy rain',
+    66: 'Light freezing rain',
+    67: 'Heavy freezing rain',
+    71: 'Slight snow',
+    73: 'Moderate snow',
+    75: 'Heavy snow',
+    77: 'Snow grains',
+    80: 'Slight rain showers',
+    81: 'Moderate rain showers',
+    82: 'Violent rain showers',
+    85: 'Slight snow showers',
+    86: 'Heavy snow showers',
+    95: 'Thunderstorm',
+    96: 'Thunderstorm with slight hail',
+    99: 'Thunderstorm with heavy hail',
+  };
+
+  return codes[code] || 'Unknown';
+}
+
+//emoji for weather codes
+function weatherCodeToEmoji(code) {
+  if (code === 0) return '☀️';
+  if ([1, 2].includes(code)) return '🌤️';
+  if (code === 3) return '☁️';
+  if ([45, 48].includes(code)) return '🌫️';
+  if ([51, 53, 55, 56, 57].includes(code)) return '🌦️';
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '🌧️';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return '❄️';
+  if ([95, 96, 99].includes(code)) return '⛈️';
+
+  return '🌍';
+}
+
+//get the weather
+export const execute = async (interaction) => {
+  try {
+    const location = interaction.options.getString('location');
+    const publicResult = interaction.options.getBoolean('public') || false;
+
+    //default to protect the input location
+    await interaction.deferReply({
+      flags: publicResult ? undefined : MessageFlagsBitField.Ephemeral,
+    });
+
+    const geo = await geocodeLocation(location);
+
+    //if unable to parse location
+    if (!geo) {
+      return interaction.editReply({
+        content:
+          'Could not find that location. Try a nearby city/town or postcode.',
+      });
+    }
+
+    const weather = await getWeather(geo.latitude, geo.longitude);
+
+    const condition = weatherCodeToText(weather.weather_code);
+    const emoji = weatherCodeToEmoji(weather.weather_code);
+
+    //embed message
+    const privateEmbed = new EmbedBuilder()
+      .setColor('Blue')
+      .setTitle(`${emoji} Weather`)
+      .setDescription(`Weather for **${geo.name}, ${geo.country}**`)
+      .addFields(
+        {
+          name: 'Temperature',
+          value: `${weather.temperature_2m}°C`,
+          inline: true,
+        },
+        {
+          name: 'Feels Like',
+          value: `${weather.apparent_temperature}°C`,
+          inline: true,
+        },
+        {
+          name: 'Condition',
+          value: condition,
+          inline: true,
+        },
+        {
+          name: 'Wind',
+          value: `${weather.wind_speed_10m} km/h`,
+          inline: true,
+        },
+        {
+          name: 'Rain',
+          value: `${weather.precipitation} mm`,
+          inline: true,
+        },
+        {
+          name: 'Humidity',
+          value: `${weather.relative_humidity_2m}%`,
+          inline: true,
+        }
+      )
+      .setFooter({
+        text: 'Location hidden from other users unless public mode is enabled.',
+      })
+      .setTimestamp();
+
+    //send private embed message
+    if (!publicResult) {
+      return interaction.editReply({
+        embeds: [privateEmbed],
+      });
+    }
+
+    //public result intentionally doesn't include city/town
+    const publicEmbed = new EmbedBuilder()
+      .setColor('Blue')
+      .setTitle(`${emoji} Weather for selected area`)
+      .addFields(
+        {
+          name: 'Temperature',
+          value: `${weather.temperature_2m}°C`,
+          inline: true,
+        },
+        {
+          name: 'Feels Like',
+          value: `${weather.apparent_temperature}°C`,
+          inline: true,
+        },
+        {
+          name: 'Condition',
+          value: condition,
+          inline: true,
+        },
+        {
+          name: 'Wind',
+          value: `${weather.wind_speed_10m} km/h`,
+          inline: true,
+        }
+      )
+      .setFooter({
+        text: `Requested by ${interaction.user.username} — location not shown`,
+      })
+      .setTimestamp();
+
+    //send public embed message
+    await interaction.editReply({
+      embeds: [publicEmbed],
+    });
+  } catch (error) {
+    console.error('Weather command failed:', error);
+
+    if (interaction.deferred || interaction.replied) {
+      await interaction.editReply({
+        content: 'Something went wrong while getting the weather...',
+      });
+    } else {
+      await interaction.reply({
+        content: 'Something went wrong while getting the weather...',
+        flags: MessageFlagsBitField.Ephemeral,
+      });
+    }
+  }
+};
