@@ -8,21 +8,27 @@ import {
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('weather')
-  .setDescription('Get weather for your area privately')
+  .setDescription('Get weather for your area')
   .addStringOption((option) =>
     option
       .setName('location')
-      .setDescription('City, town, or postcode. This will be hidden.')
+      .setDescription(
+        "City, town, or postcode, this will be hidden so you can't dox."
+      )
       .setRequired(true)
   )
-  .addBooleanOption((option) =>
+  .addStringOption((option) =>
     option
-      .setName('public')
-      .setDescription('Post a generic weather result publicly? Default: false')
+      .setName('forecast')
+      .setDescription('Choose current weather or a 10-day forecast')
       .setRequired(false)
+      .addChoices(
+        { name: 'Current weather', value: 'current' },
+        { name: '10-day forecast', value: '10day' }
+      )
   );
 
-//api function call location
+//geocode api function
 async function geocodeLocation(location) {
   const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
 
@@ -46,24 +52,40 @@ async function geocodeLocation(location) {
   return data.results[0];
 }
 
-//api function call lat-long
-async function getWeather(latitude, longitude) {
+//getWeather api function
+async function getWeather(latitude, longitude, forecastType = 'current') {
   const url = new URL('https://api.open-meteo.com/v1/forecast');
 
   url.searchParams.set('latitude', latitude);
   url.searchParams.set('longitude', longitude);
-  url.searchParams.set(
-    'current',
-    [
-      'temperature_2m',
-      'relative_humidity_2m',
-      'apparent_temperature',
-      'precipitation',
-      'weather_code',
-      'wind_speed_10m',
-    ].join(',')
-  );
   url.searchParams.set('timezone', 'auto');
+
+  if (forecastType === '10day') {
+    url.searchParams.set(
+      'daily',
+      [
+        'weather_code',
+        'temperature_2m_max',
+        'temperature_2m_min',
+        'precipitation_sum',
+        'wind_speed_10m_max',
+      ].join(',')
+    );
+
+    url.searchParams.set('forecast_days', '10');
+  } else {
+    url.searchParams.set(
+      'current',
+      [
+        'temperature_2m',
+        'relative_humidity_2m',
+        'apparent_temperature',
+        'precipitation',
+        'weather_code',
+        'wind_speed_10m',
+      ].join(',')
+    );
+  }
 
   const response = await fetch(url);
 
@@ -71,9 +93,7 @@ async function getWeather(latitude, longitude) {
     throw new Error(`Weather fetch failed: ${response.status}`);
   }
 
-  const data = await response.json();
-
-  return data.current;
+  return await response.json();
 }
 
 //weather codes to text
@@ -126,15 +146,26 @@ function weatherCodeToEmoji(code) {
   return '🌍';
 }
 
+//format date for forecast display
+function formatForecastDate(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+
+  return date.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  });
+}
+
 //get the weather
 export const execute = async (interaction) => {
   try {
     const location = interaction.options.getString('location');
-    const publicResult = interaction.options.getBoolean('public') || false;
+    const forecastType = interaction.options.getString('forecast') || 'current';
 
-    //default to protect the input location
+    //initial reply is hidden
     await interaction.deferReply({
-      flags: publicResult ? undefined : MessageFlagsBitField.Ephemeral,
+      flags: MessageFlagsBitField.Ephemeral,
     });
 
     const geo = await geocodeLocation(location);
@@ -147,95 +178,128 @@ export const execute = async (interaction) => {
       });
     }
 
-    const weather = await getWeather(geo.latitude, geo.longitude);
+    //resolved location shown only in the hidden/ephemeral reply
+    const privateLocationText = `${geo.name}, ${geo.country}`;
 
-    const condition = weatherCodeToText(weather.weather_code);
-    const emoji = weatherCodeToEmoji(weather.weather_code);
-
-    //embed message
-    const privateEmbed = new EmbedBuilder()
-      .setColor('Blue')
-      .setTitle(`${emoji} Weather`)
-      .setDescription(`Weather for **${geo.name}, ${geo.country}**`)
-      .addFields(
-        {
-          name: 'Temperature',
-          value: `${weather.temperature_2m}°C`,
-          inline: true,
-        },
-        {
-          name: 'Feels Like',
-          value: `${weather.apparent_temperature}°C`,
-          inline: true,
-        },
-        {
-          name: 'Condition',
-          value: condition,
-          inline: true,
-        },
-        {
-          name: 'Wind',
-          value: `${weather.wind_speed_10m} km/h`,
-          inline: true,
-        },
-        {
-          name: 'Rain',
-          value: `${weather.precipitation} mm`,
-          inline: true,
-        },
-        {
-          name: 'Humidity',
-          value: `${weather.relative_humidity_2m}%`,
-          inline: true,
-        }
-      )
-      .setFooter({
-        text: 'Location hidden from other users unless public mode is enabled.',
-      })
-      .setTimestamp();
-
-    //send private embed message
-    if (!publicResult) {
-      return interaction.editReply({
-        embeds: [privateEmbed],
+    if (forecastType === '10day') {
+      await interaction.editReply({
+        content: `Processing 10-day forecast for **${privateLocationText}**...`,
+      });
+    } else {
+      await interaction.editReply({
+        content: `Processing current weather for **${privateLocationText}**...`,
       });
     }
 
-    //public result intentionally doesn't include city/town
-    const publicEmbed = new EmbedBuilder()
-      .setColor('Blue')
-      .setTitle(`${emoji} Weather for selected area`)
-      .addFields(
-        {
-          name: 'Temperature',
-          value: `${weather.temperature_2m}°C`,
-          inline: true,
-        },
-        {
-          name: 'Feels Like',
-          value: `${weather.apparent_temperature}°C`,
-          inline: true,
-        },
-        {
-          name: 'Condition',
-          value: condition,
-          inline: true,
-        },
-        {
-          name: 'Wind',
-          value: `${weather.wind_speed_10m} km/h`,
-          inline: true,
-        }
-      )
-      .setFooter({
-        text: `Requested by ${interaction.user.username} — location not shown`,
-      })
-      .setTimestamp();
+    //weather object
+    const weatherData = await getWeather(
+      geo.latitude,
+      geo.longitude,
+      forecastType
+    );
 
-    //send public embed message
-    await interaction.editReply({
-      embeds: [publicEmbed],
-    });
+    //current weather result
+    if (forecastType === 'current') {
+      const weather = weatherData.current;
+
+      const condition = weatherCodeToText(weather.weather_code);
+      const emoji = weatherCodeToEmoji(weather.weather_code);
+
+      //public embed message
+      const weatherEmbed = new EmbedBuilder()
+        .setColor('Blue')
+        .setTitle(`${emoji} ${interaction.user.username}'s Weather`)
+        .setDescription(`Current weather for ${interaction.user}`)
+        .addFields(
+          {
+            name: 'Temperature',
+            value: `${weather.temperature_2m}°C`,
+            inline: true,
+          },
+          {
+            name: 'Feels Like',
+            value: `${weather.apparent_temperature}°C`,
+            inline: true,
+          },
+          {
+            name: 'Condition',
+            value: condition,
+            inline: true,
+          },
+          {
+            name: 'Wind',
+            value: `${weather.wind_speed_10m} km/h`,
+            inline: true,
+          },
+          {
+            name: 'Rain',
+            value: `${weather.precipitation} mm`,
+            inline: true,
+          },
+          {
+            name: 'Humidity',
+            value: `${weather.relative_humidity_2m}%`,
+            inline: true,
+          }
+        )
+        .setFooter({
+          text: 'Location hidden for privacy',
+        })
+        .setTimestamp();
+
+      //finish hidden interaction first, with location visible only to the user
+      await interaction.editReply({
+        content: `Current weather for **${privateLocationText}** posted publicly without showing your location.`,
+      });
+
+      //send full weather result publicly
+      return interaction.followUp({
+        embeds: [weatherEmbed],
+      });
+    }
+
+    //10-day forecast result
+    if (forecastType === '10day') {
+      const daily = weatherData.daily;
+
+      const forecastFields = daily.time.map((date, index) => {
+        const code = daily.weather_code[index];
+        const emoji = weatherCodeToEmoji(code);
+        const condition = weatherCodeToText(code);
+
+        return {
+          name: `${emoji} ${formatForecastDate(date)}`,
+          value:
+            `**${condition}**\n` +
+            `High: ${daily.temperature_2m_max[index]}°C | ` +
+            `Low: ${daily.temperature_2m_min[index]}°C\n` +
+            `Rain: ${daily.precipitation_sum[index]} mm | ` +
+            `Wind: ${daily.wind_speed_10m_max[index]} km/h`,
+          inline: false,
+        };
+      });
+
+      //forecast embed message
+      const forecastEmbed = new EmbedBuilder()
+        .setColor('Blue')
+        .setTitle(`🌦️ ${interaction.user.username}'s 10-Day Weather Forecast`)
+        .setDescription(`10-day forecast for ${interaction.user}`)
+        .addFields(forecastFields)
+        .setFooter({
+          text: 'Location hidden for privacy',
+        })
+        .setTimestamp();
+
+      //finish hidden interaction first, with location visible only to the user
+      await interaction.editReply({
+        content: `10-day forecast for **${privateLocationText}** posted publicly without showing your location.`,
+      });
+
+      //send full forecast publicly
+      return interaction.followUp({
+        embeds: [forecastEmbed],
+      });
+    }
   } catch (error) {
     console.error('Weather command failed:', error);
 

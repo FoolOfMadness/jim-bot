@@ -1,7 +1,7 @@
 //autopublish announcements from announcement channels
 import { Events, ChannelType } from 'discord.js';
 
-//announcement channel IDs
+//announcement channel IDs - yeah it's hardcoded whatever
 const announcementChannels = [
   '1284437242080923795', //Jim announcement
   '1284437246468034580', //Jim stream
