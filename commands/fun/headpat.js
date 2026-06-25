@@ -1,11 +1,12 @@
 //headpat message command
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { GIF_CONFIG } from '../../constants/gifDefinitions.js';
+import { lockGif, unlockGif } from '../../utils/gifLock.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,53 +24,114 @@ export const data = new SlashCommandBuilder()
 
 //adds user's profile pic to canvas
 export const execute = async (interaction) => {
+  const jobId = `${interaction.commandName}-${interaction.id}`;
+
+  //global GIF lock check
+  if (!lockGif(jobId)) {
+    return interaction.reply({
+      content: "I'm already making a GIF, give me a minute.",
+      flags: EPHEMERAL_FLAG,
+    });
+  }
+
   await interaction.deferReply();
-  const target = interaction.options.getMember('target');
-  const options = {
-    fps: 15,
-    delay: 0,
-    repeat: 0,
-    algorithm: 'neuquant',
-    optimiser: true,
-    quality: 100,
-  };
 
-  //gets user's profile pic
-  const avatar = await loadImage(target.displayAvatarURL({ extension: 'png' }));
+  try {
+    const target = interaction.options.getMember('target');
 
-  //creates new gif of user's avatar getting a headpat
-  const callBack = async (
-    context,
-    _width,
-    _height,
-    _totalFrames,
-    currentFrame
-  ) => {
-    const canvas = createCanvas(avatar.width, avatar.height);
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(avatar, 0, 0, avatar.width, avatar.height);
-    context.globalCompositeOperation = 'destination-over';
-    if (currentFrame % 3 == 0) {
-      context.drawImage(canvas, 0, 20, canvas.width, canvas.height + 20);
-    } else {
-      context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-    }
-  };
-
-  //sends new headpat gif and message
-  canvasGif(join(__dirname, 'headpat.gif'), callBack, options)
-    .then((buffer) => {
-      const attachment = new AttachmentBuilder(buffer, { name: 'headpat.gif' });
+    if (!target) {
       return interaction.followUp({
-        content: `${interaction.member} is headpatting ${target}!`,
-        files: [attachment],
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-      return interaction.followUp({
-        content: 'Something went wrong, whoops.',
+        content: "I don't know anyone by that name...",
         flags: EPHEMERAL_FLAG,
       });
+    }
+
+    //get user profile pic
+    const avatar = await loadImage(
+      target.displayAvatarURL({
+        extension: 'png',
+        size: GIF_CONFIG.avatarSize,
+      })
+    );
+
+    //pre-render avatar once
+    const avatarCanvas = createCanvas(
+      GIF_CONFIG.avatarSize,
+      GIF_CONFIG.avatarSize
+    );
+
+    const avatarCtx = avatarCanvas.getContext('2d');
+
+    avatarCtx.drawImage(
+      avatar,
+      0,
+      0,
+      GIF_CONFIG.avatarSize,
+      GIF_CONFIG.avatarSize
+    );
+
+    //use import values
+    const options = {
+      fps: GIF_CONFIG.fps,
+      delay: GIF_CONFIG.delay,
+      repeat: GIF_CONFIG.repeat,
+      algorithm: GIF_CONFIG.algorithm,
+      optimiser: GIF_CONFIG.optimiser,
+      quality: GIF_CONFIG.quality,
+    };
+
+    //creates new gif of user's avatar getting a headpat
+    const callBack = async (
+      context,
+      _width,
+      _height,
+      _totalFrames,
+      currentFrame
+    ) => {
+      context.globalCompositeOperation = 'destination-over';
+
+      if (currentFrame % 3 === 0) {
+        context.drawImage(
+          avatarCanvas,
+          0,
+          GIF_CONFIG.avatarOffsetY,
+          GIF_CONFIG.avatarSize,
+          GIF_CONFIG.avatarSize + GIF_CONFIG.avatarOffsetY
+        );
+      } else {
+        context.drawImage(
+          avatarCanvas,
+          0,
+          0,
+          GIF_CONFIG.avatarSize,
+          GIF_CONFIG.avatarSize
+        );
+      }
+    };
+
+    const buffer = await canvasGif(
+      join(__dirname, 'headpat.gif'),
+      callBack,
+      options
+    );
+
+    const attachment = new AttachmentBuilder(buffer, {
+      name: 'headpat.gif',
     });
+
+    //headpat user
+    return interaction.followUp({
+      content: `${interaction.member} is headpatting ${target}!`,
+      files: [attachment],
+    });
+  } catch (error) {
+    console.error('Headpat command failed:', error);
+
+    return interaction.followUp({
+      content: 'Something went wrong, whoops.',
+      flags: EPHEMERAL_FLAG,
+    });
+  } finally {
+    unlockGif(jobId);
+  }
 };

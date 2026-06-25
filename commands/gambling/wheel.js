@@ -6,23 +6,19 @@ import {
 } from 'discord.js';
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { lockGif, unlockGif } from '../../utils/gifLock.js';
 
 //config variables
 const WHEEL_SIZE = 400;
 const WHEEL_PADDING = 10;
 const POINTER_SIZE = 15;
 const CENTER_DOT_SIZE = 10;
-
 const GIF_FPS = 15;
 const GIF_TOTAL_FRAMES = 45;
 const GIF_QUALITY = 15;
-
 const MAX_SEGMENTS = 20;
 const MAX_LABEL_LENGTH = 24;
-
-//prevents simultaneous gif renders
-let isRenderingGif = false;
 
 //single tiny canvas for colour validation/parsing
 const colourParseCtx = createCanvas(1, 1).getContext('2d');
@@ -50,14 +46,6 @@ export const data = new SlashCommandBuilder()
 
 //spin the wheel
 export const execute = async (interaction) => {
-  //gif lock check
-  if (isRenderingGif) {
-    return interaction.reply({
-      content: "I'm already spinning, give me a minute.",
-      flags: EPHEMERAL_FLAG,
-    });
-  }
-
   const input = interaction.options.getString('options');
   const colourInput = interaction.options.getString('colours') || '';
 
@@ -77,6 +65,7 @@ export const execute = async (interaction) => {
       flags: EPHEMERAL_FLAG,
     });
   }
+
   //ensure less than max
   if (segments.length > MAX_SEGMENTS) {
     return interaction.reply({
@@ -85,8 +74,15 @@ export const execute = async (interaction) => {
     });
   }
 
-  //gif lock on
-  isRenderingGif = true;
+  const jobId = `${interaction.commandName}-${interaction.id}`;
+
+  //global gif lock check
+  if (!lockGif(jobId)) {
+    return interaction.reply({
+      content: "I'm already making a GIF, give me a minute.",
+      flags: EPHEMERAL_FLAG,
+    });
+  }
 
   await interaction.deferReply();
 
@@ -128,8 +124,7 @@ export const execute = async (interaction) => {
       content: 'Something went wrong while spinning the wheel...',
     });
   } finally {
-    //gif lock off
-    isRenderingGif = false;
+    unlockGif(jobId);
   }
 };
 
@@ -363,5 +358,6 @@ function colourToRgb(color) {
   } catch {
     //fallback below
   }
+
   return { r: 255, g: 255, b: 255 };
 }

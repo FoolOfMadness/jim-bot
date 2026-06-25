@@ -1,23 +1,15 @@
 //bonk message command
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { GIF_CONFIG } from '../../constants/gifDefinitions.js';
+import { lockGif, unlockGif } from '../../utils/gifLock.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-//config variables
-const AVATAR_SIZE = 256;
-const BONK_OFFSET_Y = 20;
-const GIF_FPS = 15;
-const GIF_QUALITY = 50;
-
-//prevents simultaneous gif renders
-let isRenderingGif = false;
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -32,16 +24,15 @@ export const data = new SlashCommandBuilder()
 
 //adds user's profile pic to canvas
 export const execute = async (interaction) => {
-  //gif lock check
-  if (isRenderingGif) {
+  const jobId = `${interaction.commandName}-${interaction.id}`;
+
+  //global GIF lock check
+  if (!lockGif(jobId)) {
     return interaction.reply({
-      content: "I'm already bonking someone, give me a minute.",
+      content: "I'm already making a GIF, give me a minute.",
       flags: EPHEMERAL_FLAG,
     });
   }
-
-  //gif lock on
-  isRenderingGif = true;
 
   await interaction.deferReply();
 
@@ -59,23 +50,34 @@ export const execute = async (interaction) => {
     const avatar = await loadImage(
       target.displayAvatarURL({
         extension: 'png',
-        size: AVATAR_SIZE,
+        size: GIF_CONFIG.avatarSize,
       })
     );
 
     //pre-render avatar once
-    const avatarCanvas = createCanvas(AVATAR_SIZE, AVATAR_SIZE);
+    const avatarCanvas = createCanvas(
+      GIF_CONFIG.avatarSize,
+      GIF_CONFIG.avatarSize
+    );
+
     const avatarCtx = avatarCanvas.getContext('2d');
 
-    avatarCtx.drawImage(avatar, 0, 0, AVATAR_SIZE, AVATAR_SIZE);
+    avatarCtx.drawImage(
+      avatar,
+      0,
+      0,
+      GIF_CONFIG.avatarSize,
+      GIF_CONFIG.avatarSize
+    );
 
+    //use import values
     const options = {
-      fps: GIF_FPS,
-      delay: 0,
-      repeat: 0,
-      algorithm: 'neuquant',
-      optimiser: true,
-      quality: GIF_QUALITY,
+      fps: GIF_CONFIG.fps,
+      delay: GIF_CONFIG.delay,
+      repeat: GIF_CONFIG.repeat,
+      algorithm: GIF_CONFIG.algorithm,
+      optimiser: GIF_CONFIG.optimiser,
+      quality: GIF_CONFIG.quality,
     };
 
     //creates new gif of user's avatar getting bonked
@@ -92,12 +94,18 @@ export const execute = async (interaction) => {
         context.drawImage(
           avatarCanvas,
           0,
-          BONK_OFFSET_Y,
-          AVATAR_SIZE,
-          AVATAR_SIZE + BONK_OFFSET_Y
+          GIF_CONFIG.avatarOffsetY,
+          GIF_CONFIG.avatarSize,
+          GIF_CONFIG.avatarSize + GIF_CONFIG.avatarOffsetY
         );
       } else {
-        context.drawImage(avatarCanvas, 0, 0, AVATAR_SIZE, AVATAR_SIZE);
+        context.drawImage(
+          avatarCanvas,
+          0,
+          0,
+          GIF_CONFIG.avatarSize,
+          GIF_CONFIG.avatarSize
+        );
       }
     };
 
@@ -124,7 +132,6 @@ export const execute = async (interaction) => {
       flags: EPHEMERAL_FLAG,
     });
   } finally {
-    //gif lock off
-    isRenderingGif = false;
+    unlockGif(jobId);
   }
 };

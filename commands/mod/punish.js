@@ -8,7 +8,7 @@ import {
   ComponentType,
   EmbedBuilder,
 } from 'discord.js';
-import { chooseWithProbabilities } from '../../randomUtil.js';
+import { chooseWithProbabilities } from '../../utils/randomUtil.js';
 import { gomenasorry } from '../fun/gomenasorry.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
