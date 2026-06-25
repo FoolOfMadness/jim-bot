@@ -1,5 +1,5 @@
 //ping command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -13,7 +13,7 @@ export const execute = async (interaction) => {
   if (cooldown.has(interaction.user.id)) {
     return interaction.reply({
       content: 'Please wait before using this command again.',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 
@@ -22,7 +22,7 @@ export const execute = async (interaction) => {
 
   await interaction.reply({
     content: 'Pinging...',
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 
   const sent = await interaction.fetchReply();
@@ -31,6 +31,6 @@ export const execute = async (interaction) => {
     content: `Roundtrip latency: ${
       sent.createdTimestamp - interaction.createdTimestamp
     }ms`,
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 };

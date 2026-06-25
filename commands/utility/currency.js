@@ -1,5 +1,5 @@
 //currency command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -33,7 +33,7 @@ export const execute = async (interaction) => {
 
   await interaction.reply({
     content: 'Converting...',
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 
   try {
@@ -49,13 +49,13 @@ export const execute = async (interaction) => {
 
     await interaction.editReply({
       content: `${amount} ${from} = ${data.result.toFixed(2)} ${to}`,
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   } catch (error) {
     console.error(error);
     await interaction.editReply({
       content: 'Something went wrong, whoops.',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

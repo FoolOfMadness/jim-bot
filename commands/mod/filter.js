@@ -2,7 +2,7 @@
 import {
   SlashCommandBuilder,
   PermissionFlagsBits,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 
 //name of slash commands, subcommands, & descriptions
@@ -73,7 +73,7 @@ export const execute = async (interaction) => {
         console.error(error);
         return interaction.followUp({
           content: 'Something went wrong.',
-          flags: MessageFlagsBitField.Ephemeral,
+          flags: MessageFlags.Ephemeral ?? 64,
         });
       }
     }
@@ -97,7 +97,7 @@ export const execute = async (interaction) => {
       console.error(error);
       return interaction.followUp({
         content: 'Something went wrong...',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
   }

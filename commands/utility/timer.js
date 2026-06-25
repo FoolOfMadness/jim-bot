@@ -1,5 +1,5 @@
 //timer command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 
 //store active timers
 const activeTimers = new Map();
@@ -51,7 +51,7 @@ export const execute = async (interaction) => {
     if (!timers || Object.keys(timers).length === 0) {
       return interaction.reply({
         content: '⏱️ You have no active timers.',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -60,7 +60,7 @@ export const execute = async (interaction) => {
       .join('\n');
     return interaction.reply({
       content: `⏱️ Your active timers:\n${list}`,
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 
@@ -72,12 +72,12 @@ export const execute = async (interaction) => {
       delete timers[label];
       return interaction.reply({
         content: `❌ Timer **${label}** canceled.`,
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     } else {
       return interaction.reply({
         content: `⚠️ No active timer found with label **${label}**.`,
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
   }
@@ -89,7 +89,7 @@ export const execute = async (interaction) => {
     if (!match) {
       return interaction.reply({
         content: '❌ Invalid duration format. Use `10s`, `5m`, or `2h`.',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -98,15 +98,15 @@ export const execute = async (interaction) => {
       unit === 's'
         ? amount * 1000
         : unit === 'm'
-        ? amount * 60 * 1000
-        : amount * 60 * 60 * 1000;
+          ? amount * 60 * 1000
+          : amount * 60 * 60 * 1000;
 
     //duplicate label check
     const timers = activeTimers.get(userId) || {};
     if (timers[label]) {
       return interaction.reply({
         content: `⚠️ You already have a timer labeled **${label}**.`,
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -124,7 +124,7 @@ export const execute = async (interaction) => {
     //timer started message
     return interaction.reply({
       content: `⏳ **${label}** timer started for ${durationInput}.`,
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

@@ -1,9 +1,5 @@
 //weather command
-import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -165,7 +161,7 @@ export const execute = async (interaction) => {
 
     //initial reply is hidden
     await interaction.deferReply({
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
 
     const geo = await geocodeLocation(location);
@@ -310,7 +306,7 @@ export const execute = async (interaction) => {
     } else {
       await interaction.reply({
         content: 'Something went wrong while getting the weather...',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
   }

@@ -1,5 +1,5 @@
 //timestamp command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 import moment from 'moment-timezone';
 const _tz = moment.tz;
 
@@ -157,17 +157,17 @@ export const execute = async (interaction) => {
     if (!_tz.zone(timezone)) {
       return interaction.reply({
         content: 'Invalid timezone!',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     } else if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
       return interaction.reply({
         content: 'Invalid date format. Please use YYYY-MM-DD for date!',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     } else if (!moment(time, 'HH:mm', true).isValid()) {
       return interaction.reply({
         content: 'Invalid time format. Please use HH:mm for time!',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -192,7 +192,7 @@ export const execute = async (interaction) => {
       //send ephemeral message first, this is to protect the users country/timezone
       await interaction.reply({
         content: `You can copy & paste this: \`<t:${timestamp}:${format}>\`\nThis message is invisible to protect you!`,
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
       //follow-up message that shows the timestamp publicly
       await interaction.followUp(publicMessage);
@@ -201,7 +201,7 @@ export const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while converting the time...',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

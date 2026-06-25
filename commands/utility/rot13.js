@@ -1,7 +1,7 @@
 //cipher (ROT13) command
 import {
   SlashCommandBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
   ContextMenuCommandBuilder,
   ApplicationCommandType,
 } from 'discord.js';
@@ -43,7 +43,7 @@ export const execute = async (interaction) => {
     if (!message) {
       return await interaction.reply({
         content: 'No message content found to encode/decode.',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -53,13 +53,13 @@ export const execute = async (interaction) => {
     //give result
     await interaction.reply({
       content: `🔒 **ROT13 Result:**\n${result}`,
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while processing the message...',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import {
   SlashCommandBuilder,
   AttachmentBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -39,7 +39,7 @@ export const execute = async (interaction) => {
   if (isRenderingGif) {
     return interaction.reply({
       content: "I'm already bonking someone, give me a minute.",
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 
@@ -54,7 +54,7 @@ export const execute = async (interaction) => {
     if (!target) {
       return interaction.followUp({
         content: "I don't know anyone by that name...",
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
     }
 
@@ -124,7 +124,7 @@ export const execute = async (interaction) => {
 
     return interaction.followUp({
       content: 'Something went wrong, whoops.',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   } finally {
     //gif lock off

@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import {
   SlashCommandBuilder,
   AttachmentBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 import { fileURLToPath } from 'url';
 
@@ -98,7 +98,7 @@ export const execute = async (interaction) => {
     console.error(error);
     return interaction.followUp({
       content: 'Something went wrong, whoops.',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

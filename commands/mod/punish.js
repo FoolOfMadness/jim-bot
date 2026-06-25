@@ -7,7 +7,7 @@ import {
   ActionRowBuilder,
   ComponentType,
   EmbedBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 import { chooseWithProbabilities } from '../../randomUtil.js';
 import { gomenasorry } from '../fun/gomenasorry.js';
@@ -305,7 +305,7 @@ export const execute = async (interaction) => {
         });
       });
   } else if (interaction.options.getSubcommand() === 'one') {
-    await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral ?? 64 });
     const target = interaction.options.getMember('target');
 
     //check if can timeout user
@@ -360,7 +360,7 @@ export const execute = async (interaction) => {
     //reply message when command starts
     await interaction.editReply("It's done, buddy.");
   } else if (interaction.options.getSubcommand() == 'extreme') {
-    await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral ?? 64 });
     const target = interaction.options.getMember('target');
     const timeInSeconds = interaction.options.getInteger('time') ?? 150;
     await extremePunish(

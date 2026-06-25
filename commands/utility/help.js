@@ -1,9 +1,5 @@
 //help command to explain other JimBot commands
-import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 
 //label categories
 const categoryLabels = {
@@ -52,6 +48,6 @@ export const execute = async (interaction) => {
   //send help message
   await interaction.reply({
     embeds: [embed],
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 };

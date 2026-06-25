@@ -5,7 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 
 //name of slash command & description
@@ -185,7 +185,7 @@ export const execute = async (interaction) => {
         await message.edit({ components: [] }); //remove buttons
         return interaction.followUp({
           content: 'You ran out of time to play!',
-          flags: MessageFlagsBitField.Ephemeral,
+          flags: MessageFlags.Ephemeral ?? 64,
         }); //exit
       }
 

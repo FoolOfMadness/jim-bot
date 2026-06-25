@@ -1,9 +1,5 @@
 //coinflip command
-import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -36,7 +32,7 @@ export const execute = async (interaction) => {
       await interaction.reply({
         content:
           'Please enter a valid number of coins to flip between 1 and 100!',
-        flags: MessageFlagsBitField.Ephemeral,
+        flags: MessageFlags.Ephemeral ?? 64,
       });
       return;
     }
@@ -118,7 +114,7 @@ export const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while flipping...',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 };

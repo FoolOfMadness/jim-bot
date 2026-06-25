@@ -3,7 +3,7 @@ import {
   SlashCommandBuilder,
   AttachmentBuilder,
   EmbedBuilder,
-  MessageFlagsBitField,
+  MessageFlags,
 } from 'discord.js';
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
@@ -54,7 +54,7 @@ export const execute = async (interaction) => {
   if (isRenderingGif) {
     return interaction.reply({
       content: "I'm already spinning, give me a minute.",
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 
@@ -74,14 +74,14 @@ export const execute = async (interaction) => {
   if (segments.length < 2) {
     return interaction.reply({
       content: 'Please provide at least two options.',
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
   //ensure less than max
   if (segments.length > MAX_SEGMENTS) {
     return interaction.reply({
       content: `Please provide ${MAX_SEGMENTS} options or fewer.`,
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
   }
 

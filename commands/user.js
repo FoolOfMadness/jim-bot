@@ -1,5 +1,5 @@
 //user command
-import { SlashCommandBuilder, MessageFlagsBitField } from 'discord.js';
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -9,6 +9,6 @@ export const data = new SlashCommandBuilder()
 export const execute = async (interaction) => {
   await interaction.reply({
     content: `This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAt}.`,
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 };

@@ -1,9 +1,5 @@
 //set bot activity status command
-import {
-  SlashCommandBuilder,
-  ActivityType,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { SlashCommandBuilder, ActivityType, MessageFlags } from 'discord.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -34,12 +30,12 @@ export const execute = async (interaction) => {
   if (interaction.user.id != '240246252124504064') {
     await interaction.reply({
       content: "You're not Jim. You will never be Jim.",
-      flags: MessageFlagsBitField.Ephemeral,
+      flags: MessageFlags.Ephemeral ?? 64,
     });
     return;
   }
 
-  await interaction.deferReply({ flags: MessageFlagsBitField.Ephemeral });
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral ?? 64 });
 
   //define activity type
   let activity_type = interaction.options.getString('type');
@@ -57,6 +53,6 @@ export const execute = async (interaction) => {
   //confirm
   await interaction.editReply({
     content: 'Activity updated successfully',
-    flags: MessageFlagsBitField.Ephemeral,
+    flags: MessageFlags.Ephemeral ?? 64,
   });
 };
