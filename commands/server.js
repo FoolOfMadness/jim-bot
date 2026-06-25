@@ -1,5 +1,6 @@
 //server command
-import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -9,6 +10,6 @@ export const data = new SlashCommandBuilder()
 export const execute = async (interaction) => {
   await interaction.reply({
     content: `This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.`,
-    flags: MessageFlags.Ephemeral ?? 64,
+    flags: EPHEMERAL_FLAG,
   });
 };

@@ -5,8 +5,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
-  MessageFlags,
 } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -129,14 +129,14 @@ export const execute = async (interaction) => {
   if (opponent.bot) {
     return interaction.reply({
       content: 'You cannot play tic-tac-toe against a bot.',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 
   if (opponent.id === interaction.user.id) {
     return interaction.reply({
       content: 'You cannot play against yourself.',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -202,7 +202,7 @@ export const execute = async (interaction) => {
     if (buttonInteraction.user.id !== currentPlayer.id) {
       await buttonInteraction.reply({
         content: `It is not your turn. It is currently ${currentPlayer.username}'s turn.`,
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
 
       continue;
@@ -214,7 +214,7 @@ export const execute = async (interaction) => {
     if (board[index] !== null) {
       await buttonInteraction.reply({
         content: 'That square has already been taken.',
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
 
       continue;

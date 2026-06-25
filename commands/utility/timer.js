@@ -1,5 +1,6 @@
 //timer command
-import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //store active timers
 const activeTimers = new Map();
@@ -51,7 +52,7 @@ export const execute = async (interaction) => {
     if (!timers || Object.keys(timers).length === 0) {
       return interaction.reply({
         content: '⏱️ You have no active timers.',
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
 
@@ -60,7 +61,7 @@ export const execute = async (interaction) => {
       .join('\n');
     return interaction.reply({
       content: `⏱️ Your active timers:\n${list}`,
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -72,12 +73,12 @@ export const execute = async (interaction) => {
       delete timers[label];
       return interaction.reply({
         content: `❌ Timer **${label}** canceled.`,
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     } else {
       return interaction.reply({
         content: `⚠️ No active timer found with label **${label}**.`,
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
   }
@@ -89,7 +90,7 @@ export const execute = async (interaction) => {
     if (!match) {
       return interaction.reply({
         content: '❌ Invalid duration format. Use `10s`, `5m`, or `2h`.',
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
 
@@ -106,7 +107,7 @@ export const execute = async (interaction) => {
     if (timers[label]) {
       return interaction.reply({
         content: `⚠️ You already have a timer labeled **${label}**.`,
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
 
@@ -124,7 +125,7 @@ export const execute = async (interaction) => {
     //timer started message
     return interaction.reply({
       content: `⏳ **${label}** timer started for ${durationInput}.`,
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 };

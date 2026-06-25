@@ -2,13 +2,10 @@
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
 import { join } from 'node:path';
-import {
-  SlashCommandBuilder,
-  AttachmentBuilder,
-  MessageFlags,
-} from 'discord.js';
+import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,7 +69,7 @@ export const execute = async (interaction) => {
       console.error(error);
       return interaction.followUp({
         content: 'Something went wrong, whoops.',
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     });
 };

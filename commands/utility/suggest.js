@@ -1,5 +1,6 @@
 //suggestion command
-import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -63,13 +64,13 @@ export const execute = async (interaction) => {
     //reply to the user
     await interaction.reply({
       content: 'Your suggestion has been sent successfully!',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while sending your suggestion...',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 };

@@ -3,10 +3,10 @@ import {
   SlashCommandBuilder,
   AttachmentBuilder,
   EmbedBuilder,
-  MessageFlags,
 } from 'discord.js';
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //config variables
 const WHEEL_SIZE = 400;
@@ -54,7 +54,7 @@ export const execute = async (interaction) => {
   if (isRenderingGif) {
     return interaction.reply({
       content: "I'm already spinning, give me a minute.",
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -74,14 +74,14 @@ export const execute = async (interaction) => {
   if (segments.length < 2) {
     return interaction.reply({
       content: 'Please provide at least two options.',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
   //ensure less than max
   if (segments.length > MAX_SEGMENTS) {
     return interaction.reply({
       content: `Please provide ${MAX_SEGMENTS} options or fewer.`,
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 

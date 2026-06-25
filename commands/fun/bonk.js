@@ -2,13 +2,10 @@
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
 import { join } from 'node:path';
-import {
-  SlashCommandBuilder,
-  AttachmentBuilder,
-  MessageFlags,
-} from 'discord.js';
+import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,7 +36,7 @@ export const execute = async (interaction) => {
   if (isRenderingGif) {
     return interaction.reply({
       content: "I'm already bonking someone, give me a minute.",
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -54,7 +51,7 @@ export const execute = async (interaction) => {
     if (!target) {
       return interaction.followUp({
         content: "I don't know anyone by that name...",
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
 
@@ -124,7 +121,7 @@ export const execute = async (interaction) => {
 
     return interaction.followUp({
       content: 'Something went wrong, whoops.',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   } finally {
     //gif lock off

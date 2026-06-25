@@ -1,5 +1,6 @@
 //magic8ball command
-import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -69,7 +70,7 @@ export const execute = async (interaction) => {
     console.error(error);
     await interaction.reply({
       content: 'Something went wrong while consulting the Magic 8-Ball...',
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 };

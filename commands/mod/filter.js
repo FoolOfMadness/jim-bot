@@ -1,9 +1,6 @@
 //add word/phrase to JimBot's banned word list
-import {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
-} from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //name of slash commands, subcommands, & descriptions
 export const data = new SlashCommandBuilder()
@@ -73,7 +70,7 @@ export const execute = async (interaction) => {
         console.error(error);
         return interaction.followUp({
           content: 'Something went wrong.',
-          flags: MessageFlags.Ephemeral ?? 64,
+          flags: EPHEMERAL_FLAG,
         });
       }
     }
@@ -97,7 +94,7 @@ export const execute = async (interaction) => {
       console.error(error);
       return interaction.followUp({
         content: 'Something went wrong...',
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
   }

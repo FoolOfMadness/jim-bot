@@ -5,8 +5,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
-  MessageFlags,
 } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -185,7 +185,7 @@ export const execute = async (interaction) => {
         await message.edit({ components: [] }); //remove buttons
         return interaction.followUp({
           content: 'You ran out of time to play!',
-          flags: MessageFlags.Ephemeral ?? 64,
+          flags: EPHEMERAL_FLAG,
         }); //exit
       }
 

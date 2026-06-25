@@ -7,10 +7,10 @@ import {
   ActionRowBuilder,
   ComponentType,
   EmbedBuilder,
-  MessageFlags,
 } from 'discord.js';
 import { chooseWithProbabilities } from '../../randomUtil.js';
 import { gomenasorry } from '../fun/gomenasorry.js';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //name of slash commands, subcommands, & descriptions
 export const data = new SlashCommandBuilder()
@@ -305,7 +305,7 @@ export const execute = async (interaction) => {
         });
       });
   } else if (interaction.options.getSubcommand() === 'one') {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral ?? 64 });
+    await interaction.deferReply({ flags: EPHEMERAL_FLAG });
     const target = interaction.options.getMember('target');
 
     //check if can timeout user
@@ -360,7 +360,7 @@ export const execute = async (interaction) => {
     //reply message when command starts
     await interaction.editReply("It's done, buddy.");
   } else if (interaction.options.getSubcommand() == 'extreme') {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral ?? 64 });
+    await interaction.deferReply({ flags: EPHEMERAL_FLAG });
     const target = interaction.options.getMember('target');
     const timeInSeconds = interaction.options.getInteger('time') ?? 150;
     await extremePunish(

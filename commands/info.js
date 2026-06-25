@@ -1,5 +1,6 @@
 //info command
-import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
+import { EPHEMERAL_FLAG } from '../constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -26,13 +27,13 @@ export const execute = async (interaction) => {
     } else {
       await interaction.reply({
         content: `Your username: ${interaction.user.username}\nYour ID: ${interaction.user.id}`,
-        flags: MessageFlags.Ephemeral ?? 64,
+        flags: EPHEMERAL_FLAG,
       });
     }
   } else if (interaction.options.getSubcommand() === 'server') {
     await interaction.reply({
       content: `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`,
-      flags: MessageFlags.Ephemeral ?? 64,
+      flags: EPHEMERAL_FLAG,
     });
   }
 };
