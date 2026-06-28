@@ -19,6 +19,7 @@
     "dotenv": "^16.6.1",
     "gifencoder": "^2.0.1",
     "moment-timezone": "^0.6.0",
+    "node-cron": "^4.5.0",
     "number-to-words": "^1.2.4",
     "prompt-sync": "^4.2.0",
     "require": "^0.4.4",

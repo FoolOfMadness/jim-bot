@@ -1,8 +1,10 @@
 //confirm bot ready status
 import { Events } from 'discord.js';
+import { startQotdScheduler } from '../utils/qotdScheduler.js';
 
 export const name = Events.ClientReady;
 export const once = true;
+
 export async function execute(client) {
   await client.bannedTable.sync();
 
@@ -16,6 +18,8 @@ export async function execute(client) {
     };
   });
   client.bannedWords = bannedWords;
+
+  startQotdScheduler(client);
 
   console.log(`Ready! Logged in as ${client.user.tag}`);
 }
