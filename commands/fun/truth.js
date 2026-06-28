@@ -3,7 +3,7 @@ import { createCanvas, loadImage } from 'canvas';
 import { dirname, join } from 'node:path';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 import { fileURLToPath } from 'url';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -1,6 +1,6 @@
 //coinflip command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

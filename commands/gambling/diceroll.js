@@ -1,7 +1,7 @@
 //diceroll command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import numberToWords from 'number-to-words';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

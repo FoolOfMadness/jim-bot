@@ -1,6 +1,6 @@
 //add word/phrase to JimBot's banned word list
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //name of slash commands, subcommands, & descriptions
 export const data = new SlashCommandBuilder()

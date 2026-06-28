@@ -1,6 +1,6 @@
 //suggestion command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -37,11 +37,10 @@ export const execute = async (interaction) => {
     const suggestion = interaction.options.getString('message');
     const category = interaction.options.getString('category');
     const attachment = interaction.options.getAttachment('attachment');
-    //1283043121751658593 test
-    //1281299794903433267 real
-    //suggestions go to mod-alerts channel
+
+    //suggestions go to mod channel
     const suggestionChannel = interaction.client.channels.cache.get(
-      '1281299794903433267'
+      '1283043121751658593'
     );
 
     //make an embed with the suggestion

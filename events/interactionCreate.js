@@ -1,6 +1,6 @@
 //interact with given command
 import { Events, Collection } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../constants/discordDefinitions.js';
 
 export const name = Events.InteractionCreate;
 export async function execute(interaction) {

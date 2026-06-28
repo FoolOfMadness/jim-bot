@@ -1,6 +1,6 @@
 //timer command
 import { SlashCommandBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions';
+import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 
 //store active timers
 const activeTimers = new Map();
