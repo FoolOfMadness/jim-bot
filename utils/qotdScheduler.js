@@ -13,12 +13,6 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../utils/qotdState.json');
-
-/*hardcoded
-const FORUM_CHANNEL_ID = '1284437249739456557';
-const QOTD_TAG_ID = '1517977869857591378';
-const QOTD_ROLE_ID = '1517982759451103402';
-*/
 const imagePath = path.join(__dirname, '../commands/utility/qotd.png');
 
 //cronjob for configured schedule, default 00:00 UTC

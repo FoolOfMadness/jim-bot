@@ -2,13 +2,6 @@
 import { Events, ChannelType } from 'discord.js';
 import { ANNOUNCEMENT_CHANNEL_IDS } from '../constants/env';
 
-//announcement channel IDs - yeah it's hardcoded whatever
-/*const announcementChannels = [
-  '1284437242080923795', //Jim announcement
-  '1284437246468034580', //Jim stream
-  '1109154751637098638', //Nai announcement
-];
-*/
 export const name = Events.MessageCreate;
 export /**
  * @param {Message} message

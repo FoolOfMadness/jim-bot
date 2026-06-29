@@ -10,9 +10,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../../utils/qotdState.json');
 
-//hardcoders will die
-//const MOD_CHANNEL_ID = '1283043121751658593';
-
 //name of slash command & description
 export const data = (() => {
   const command = new SlashCommandBuilder()
