@@ -3,29 +3,36 @@ import cron from 'node-cron';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  QOTD_FORUM_CHANNEL_ID,
+  QOTD_TAG_ID,
+  QOTD_ROLE_ID,
+  QOTD_CRON_SCHEDULE,
+} from '../config/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../utils/qotdState.json');
 
-//hardcoded shit
+/*hardcoded
 const FORUM_CHANNEL_ID = '1284437249739456557';
 const QOTD_TAG_ID = '1517977869857591378';
 const QOTD_ROLE_ID = '1517982759451103402';
+*/
 const imagePath = path.join(__dirname, '../commands/utility/qotd.png');
 
-//cronjob for 00:00 UTC
+//cronjob for configured schedule, default 00:00 UTC
 export function startQotdScheduler(client) {
-  cron.schedule('0 0 * * *', async () => {
-    console.log('🌅 Running QOTD scheduler (00:00 UTC)');
+  cron.schedule(QOTD_CRON_SCHEDULE, async () => {
+    console.log('🌅 Running QOTD scheduler');
 
-    //load queue & find forum
     try {
+      //load queue & find forum
       const state = JSON.parse(fs.readFileSync(statePath, 'utf8') || '{}');
 
       state.queue = state.queue || [];
 
-      const forum = client.channels.cache.get(FORUM_CHANNEL_ID);
+      const forum = client.channels.cache.get(QOTD_FORUM_CHANNEL_ID);
       if (!forum || !forum.threads) return;
 
       //close previous qotd
@@ -38,6 +45,7 @@ export function startQotdScheduler(client) {
             if (!oldThread.name.startsWith('🔒')) {
               await oldThread.setName(`🔒 ${oldThread.name}`);
             }
+
             await oldThread.setLocked(true);
             await oldThread.setArchived(true);
           }
@@ -48,14 +56,12 @@ export function startQotdScheduler(client) {
 
       //shift next qotd from json
       const next = state.queue.shift();
+
       if (!next) {
         console.log('No queued QOTD');
         fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
         return;
       }
-
-      //save queue
-      fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
 
       //increment number
       state.lastQuestionNumber = (state.lastQuestionNumber || 0) + 1;
@@ -63,7 +69,9 @@ export function startQotdScheduler(client) {
 
       //create thread
       const thread = await forum.threads.create({
-        name: `Question of the Day #${qNum} • ${next.type === 'poll' ? 'Poll' : 'Discussion'}`,
+        name: `Question of the Day #${qNum} • ${
+          next.type === 'poll' ? 'Poll' : 'Discussion'
+        }`,
         appliedTags: [QOTD_TAG_ID],
         message: {
           content:
@@ -81,7 +89,7 @@ export function startQotdScheduler(client) {
         await thread.send({
           poll: {
             question: { text: next.question },
-            answers: next.options.map((o) => ({ text: o })),
+            answers: next.options.map((option) => ({ text: option })),
             duration: 24,
             allowMultiselect: false,
           },

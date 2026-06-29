@@ -4,13 +4,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { MOD_CHANNEL_ID } from '../../constants/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../../utils/qotdState.json');
 
 //hardcoders will die
-const MOD_CHANNEL_ID = '1283043121751658593';
+//const MOD_CHANNEL_ID = '1283043121751658593';
 
 //name of slash command & description
 export const data = (() => {

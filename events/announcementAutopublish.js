@@ -1,13 +1,14 @@
 //autopublish announcements from announcement channels
 import { Events, ChannelType } from 'discord.js';
+import { ANNOUNCEMENT_CHANNEL_IDS } from '../constants/env';
 
 //announcement channel IDs - yeah it's hardcoded whatever
-const announcementChannels = [
+/*const announcementChannels = [
   '1284437242080923795', //Jim announcement
   '1284437246468034580', //Jim stream
   '1109154751637098638', //Nai announcement
 ];
-
+*/
 export const name = Events.MessageCreate;
 export /**
  * @param {Message} message
@@ -20,7 +21,7 @@ async function execute(message) {
     //check if the message is in an announcement channel that needs to be crossposted
     if (
       message.channel.type === ChannelType.GuildAnnouncement &&
-      announcementChannels.includes(message.channel.id)
+      ANNOUNCEMENT_CHANNEL_IDS.includes(message.channel.id)
     ) {
       //crosspost the message
       setTimeout(async () => {
