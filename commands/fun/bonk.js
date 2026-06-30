@@ -90,19 +90,28 @@ export const execute = async (interaction) => {
     ) => {
       context.globalCompositeOperation = 'destination-over';
 
+      //drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
       if (currentFrame % 7 === 0) {
         context.drawImage(
           avatarCanvas,
           0,
+          0,
+          avatarCanvas.width,
+          avatarCanvas.height,
+          0,
           GIF_CONFIG.avatarOffsetY,
           GIF_CONFIG.avatarSize,
-          GIF_CONFIG.avatarSize + GIF_CONFIG.avatarOffsetY
+          GIF_CONFIG.avatarSize
         );
       } else {
         context.drawImage(
           avatarCanvas,
           0,
           0,
+          avatarCanvas.width,
+          avatarCanvas.height,
+          0,
+          GIF_CONFIG.avatarOffsetY,
           GIF_CONFIG.avatarSize,
           GIF_CONFIG.avatarSize
         );

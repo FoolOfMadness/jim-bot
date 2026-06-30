@@ -205,8 +205,8 @@ export const execute = async (interaction) => {
       //public embed message
       const weatherEmbed = new EmbedBuilder()
         .setColor('Blue')
-        .setTitle(`${emoji} ${interaction.user.username}'s Weather`)
-        .setDescription(`Current weather for ${interaction.user}`)
+        .setTitle(`# ${emoji} Weather Report`)
+        .setDescription(`## Current weather for ${interaction.user}`)
         .addFields(
           {
             name: 'Temperature',
@@ -259,28 +259,35 @@ export const execute = async (interaction) => {
     if (forecastType === '10day') {
       const daily = weatherData.daily;
 
-      const forecastFields = daily.time.map((date, index) => {
+      const forecastLines = daily.time.map((date, index) => {
         const code = daily.weather_code[index];
         const emoji = weatherCodeToEmoji(code);
-        const condition = weatherCodeToText(code);
 
-        return {
-          name: `${emoji} ${formatForecastDate(date)}`,
-          value:
-            `**${condition}**\n` +
-            `High: ${daily.temperature_2m_max[index]}°C | ` +
-            `Low: ${daily.temperature_2m_min[index]}°C\n` +
-            `Rain: ${daily.precipitation_sum[index]} mm | ` +
-            `Wind: ${daily.wind_speed_10m_max[index]} km/h`,
-          inline: false,
-        };
+        return (
+          `${emoji} **${formatForecastDate(date)}** | ${condition} ` +
+          `↑ ${daily.temperature_2m_max[index]}°C ↓ ${daily.temperature_2m_min[index]}°C ` +
+          `| 🌧️ ${daily.precipitation_sum[index]}mm ` +
+          `| 💨 ${daily.wind_speed_10m_max[index]}km/h`
+        );
       });
+
+      const forecastEmbed = new EmbedBuilder()
+        .setColor('Blue')
+        .setTitle('# 🌦️ Weather Forecast')
+        .setDescription(
+          `## 10-day forecast for ${interaction.user}\n\n` +
+            forecastLines.join('\n\n') // spacing between days
+        )
+        .setFooter({
+          text: 'Location hidden for privacy',
+        })
+        .setTimestamp();
 
       //forecast embed message
       const forecastEmbed = new EmbedBuilder()
         .setColor('Blue')
-        .setTitle(`🌦️ ${interaction.user.username}'s 10-Day Weather Forecast`)
-        .setDescription(`10-day forecast for ${interaction.user}`)
+        .setTitle(`# 🌦️ Weather Forecast`)
+        .setDescription(`## 10-day forecast for ${interaction.user}`)
         .addFields(forecastFields)
         .setFooter({
           text: 'Location hidden for privacy',
@@ -303,6 +310,7 @@ export const execute = async (interaction) => {
     if (interaction.deferred || interaction.replied) {
       await interaction.editReply({
         content: 'Something went wrong while getting the weather...',
+        flags: EPHEMERAL_FLAG,
       });
     } else {
       await interaction.reply({
