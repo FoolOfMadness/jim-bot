@@ -37,3 +37,5 @@ export const QOTD_CRON_SCHEDULE = optionalEnv(
   'QOTD_CRON_SCHEDULE',
   '0 0 * * *'
 );
+
+export const MONTHLY_CHANNEL_ID = requiredEnv('MONTHLY_CHANNEL_ID');

@@ -26,9 +26,13 @@ export function startQotdScheduler(client) {
 
       state.queue = state.queue || [];
 
-      const forum = client.channels.cache.get(QOTD_FORUM_CHANNEL_ID);
-      if (!forum || !forum.threads) return;
+      const forum = await client.channels.fetch(QOTD_FORUM_CHANNEL_ID);
+      console.log('Forum found:', !!forum);
 
+      if (!forum || !forum.threads) {
+        console.log('Forum channel not found.');
+        return;
+      }
       //close previous qotd
       if (state.activeThreadId) {
         try {
