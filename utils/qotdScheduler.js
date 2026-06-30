@@ -8,7 +8,7 @@ import {
   QOTD_TAG_ID,
   QOTD_ROLE_ID,
   QOTD_CRON_SCHEDULE,
-} from '../config/env.js';
+} from '../constants/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

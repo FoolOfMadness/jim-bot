@@ -1,6 +1,6 @@
 {
   "name": "jim-bot",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Jim's very cool Discord bot",
   "type": "module",
   "main": "index.js",

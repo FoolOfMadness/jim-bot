@@ -1,6 +1,7 @@
 //temperature conversion command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { convertTemperature } from '../../utils/convertTemperature.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -31,35 +32,12 @@ export const execute = async (interaction) => {
     //declare variables, get user inputs
     const value = interaction.options.getNumber('value');
     const unit = interaction.options.getString('unit');
-    let celsius, fahrenheit, kelvin, rankine;
 
-    //convert units
-    switch (unit) {
-      case 'C':
-        celsius = value;
-        fahrenheit = (value * 9) / 5 + 32;
-        kelvin = value + 273.15;
-        rankine = ((value + 273.15) * 9) / 5;
-        break;
-      case 'F':
-        celsius = ((value - 32) * 5) / 9;
-        fahrenheit = value;
-        kelvin = ((value - 32) * 5) / 9 + 273.15;
-        rankine = value + 459.67;
-        break;
-      case 'K':
-        celsius = value - 273.15;
-        fahrenheit = ((value - 273.15) * 9) / 5 + 32;
-        kelvin = value;
-        rankine = (value * 9) / 5;
-        break;
-      case 'R':
-        celsius = ((value - 491.67) * 5) / 9;
-        fahrenheit = value - 459.67;
-        kelvin = (value * 5) / 9;
-        rankine = value;
-        break;
-    }
+    //convert with util
+    const { celsius, fahrenheit, kelvin, rankine } = convertTemperature(
+      value,
+      unit
+    );
 
     //make an embed with the conversion
     const embed = new EmbedBuilder()
