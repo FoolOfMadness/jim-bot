@@ -1,9 +1,9 @@
-// weather command
+//weather command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 import { convertTemperature } from '../../utils/convertTemperature.js';
 
-// slash command
+//name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('weather')
   .setDescription('Get weather for your area')
@@ -36,7 +36,7 @@ export const data = new SlashCommandBuilder()
       )
   );
 
-// geocode
+//geocode api function
 async function geocodeLocation(location) {
   const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
 
@@ -54,7 +54,7 @@ async function geocodeLocation(location) {
   return data.results[0];
 }
 
-// weather fetch
+//getWeather api function
 async function getWeather(lat, lon, type = 'current') {
   const url = new URL('https://api.open-meteo.com/v1/forecast');
 
@@ -95,7 +95,7 @@ async function getWeather(lat, lon, type = 'current') {
   return res.json();
 }
 
-// helpers
+//weather codes to text
 function weatherCodeToText(code) {
   const codes = {
     0: 'Clear sky',
@@ -131,6 +131,7 @@ function weatherCodeToText(code) {
   return codes[code] || 'Unknown';
 }
 
+//emoji for weather codes
 function weatherCodeToEmoji(code) {
   if (code === 0) return '☀️';
   if ([1, 2].includes(code)) return '🌤️';
@@ -140,10 +141,10 @@ function weatherCodeToEmoji(code) {
   if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '🌧️';
   if ([71, 73, 75, 77, 85, 86].includes(code)) return '❄️';
   if ([95, 96, 99].includes(code)) return '⛈️';
-
   return '🌍';
 }
 
+//format date for forecast display
 function formatForecastDate(dateString) {
   const date = new Date(`${dateString}T00:00:00`);
   return date.toLocaleDateString('en-GB', {
@@ -153,7 +154,7 @@ function formatForecastDate(dateString) {
   });
 }
 
-// execute
+//get the weather
 export const execute = async (interaction) => {
   try {
     const location = interaction.options.getString('location');
@@ -177,16 +178,19 @@ export const execute = async (interaction) => {
       return t[unitKey];
     };
 
+    //initial reply is hidden
     await interaction.deferReply({ flags: EPHEMERAL_FLAG });
 
     const geo = await geocodeLocation(location);
 
+    //if unable to parse location
     if (!geo) {
       return interaction.editReply({
         content: 'Could not find that location.',
       });
     }
 
+    //resolved location shown only in the ephemeral reply
     const privateLocationText = `${geo.name}, ${geo.country}`;
 
     await interaction.editReply({
@@ -196,19 +200,21 @@ export const execute = async (interaction) => {
           : `Processing current weather for **${privateLocationText}**...`,
     });
 
+    //weather object
     const weatherData = await getWeather(
       geo.latitude,
       geo.longitude,
       forecastType
     );
 
-    // CURRENT
+    //current weather result
     if (forecastType === 'current') {
       const weather = weatherData.current;
 
       const emoji = weatherCodeToEmoji(weather.weather_code);
       const condition = weatherCodeToText(weather.weather_code);
 
+      //public embed message
       const embed = new EmbedBuilder()
         .setColor('Blue')
         .setTitle(`${emoji} Weather Report (${unitSymbol})`)
@@ -251,7 +257,7 @@ export const execute = async (interaction) => {
       return interaction.followUp({ embeds: [embed] });
     }
 
-    // 10-DAY
+    //10-day forecast result
     if (forecastType === '10day') {
       const daily = weatherData.daily;
 
@@ -270,6 +276,7 @@ export const execute = async (interaction) => {
         );
       });
 
+      //forecast embed message
       const embed = new EmbedBuilder()
         .setColor('Blue')
         .setTitle(`🌦️ Weather Forecast (${unitSymbol})`)
@@ -280,10 +287,11 @@ export const execute = async (interaction) => {
         .setFooter({ text: 'Location hidden for privacy' })
         .setTimestamp();
 
+      //finish hidden interaction first, with location visible only to the user
       await interaction.editReply({
         content: `10-day forecast for **${privateLocationText}** posted.`,
       });
-
+      //send full forecast publicly
       return interaction.followUp({ embeds: [embed] });
     }
   } catch (err) {
@@ -294,7 +302,6 @@ export const execute = async (interaction) => {
         content: 'Something went wrong while getting the weather...',
       });
     }
-
     return interaction.reply({
       content: 'Something went wrong while getting the weather...',
       flags: EPHEMERAL_FLAG,
