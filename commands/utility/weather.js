@@ -276,7 +276,7 @@ export const execute = async (interaction) => {
         .setTitle('# 🌦️ Weather Forecast')
         .setDescription(
           `## 10-day forecast for ${interaction.user}\n\n` +
-            forecastLines.join('\n\n') //spacing between days
+            forecastLines.join('\n\n')
         )
         .setFooter({
           text: 'Location hidden for privacy',
