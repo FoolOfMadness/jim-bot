@@ -1,15 +1,11 @@
 //bonk message command
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
 import { GIF_CONFIG } from '../../constants/gifDefinitions.js';
 import { lockGif, unlockGif } from '../../utils/gifLock.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { BONK_GIF } from '../../constants/assets.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -118,11 +114,7 @@ export const execute = async (interaction) => {
       }
     };
 
-    const buffer = await canvasGif(
-      join(__dirname, 'bonk.gif'),
-      callBack,
-      options
-    );
+    const buffer = await canvasGif(BONK_GIF, callBack, options);
 
     const attachment = new AttachmentBuilder(buffer, {
       name: 'bonk.gif',

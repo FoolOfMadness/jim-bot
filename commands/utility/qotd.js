@@ -20,6 +20,12 @@ export const data = (() => {
         .setName('question')
         .setDescription('The question to post')
         .setRequired(true)
+    )
+    .addAttachmentOption((option) =>
+      option
+        .setName('image')
+        .setDescription('Optional image for the QOTD')
+        .setRequired(false)
     );
   //loop for possible options
   for (let i = 1; i <= 10; i++) {

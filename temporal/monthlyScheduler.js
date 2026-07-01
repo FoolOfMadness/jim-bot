@@ -1,19 +1,13 @@
 //monthly post scheduler
 import cron from 'node-cron';
 import { EmbedBuilder } from 'discord.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { MONTHLY_CHANNEL_ID } from '../constants/env.js';
+import { MONTHLY_VIDEO } from '../constants/assets.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-//first
-const VIDEO_PATH = path.join(__dirname, 'firstlei.mp4');
-
+//first day of each month at 00:00 UTC
 const CRON = '0 0 1 * *';
 
-//post the video on the first of each month at 00:00 UTC
+//post the video
 export function startMonthlyScheduler(client) {
   cron.schedule(CRON, async () => {
     console.log('🎬 Running Monthly Scheduler');
@@ -25,7 +19,7 @@ export function startMonthlyScheduler(client) {
       await channel.send({
         content: "@everyone **Wake up! It's the first of the month!**",
         allowedMentions: { parse: ['everyone'] },
-        files: [VIDEO_PATH],
+        files: [MONTHLY_VIDEO],
       });
 
       console.log('Monthly video posted');

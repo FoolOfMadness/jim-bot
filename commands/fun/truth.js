@@ -1,12 +1,8 @@
 //red & blue truth umineko command
 import { createCanvas, loadImage } from 'canvas';
-import { dirname, join } from 'node:path';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
-import { fileURLToPath } from 'url';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { BG_GIF } from '../../constants/assets.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -34,7 +30,7 @@ export const execute = async (interaction) => {
 
   try {
     //load background image (change to a PNG)
-    const bgImage = await loadImage(join(__dirname, 'bg.gif'));
+    const bgImage = await loadImage(BG_GIF);
     const { width, height } = bgImage;
 
     const canvas = createCanvas(width, height);

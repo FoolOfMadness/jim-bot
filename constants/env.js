@@ -1,3 +1,4 @@
+//env path manager
 import 'dotenv/config';
 
 function requiredEnv(name) {

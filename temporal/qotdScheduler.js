@@ -9,11 +9,11 @@ import {
   QOTD_ROLE_ID,
   QOTD_CRON_SCHEDULE,
 } from '../constants/env.js';
+import { QOTD_IMAGE } from '../constants/assets.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../utils/qotdState.json');
-const imagePath = path.join(__dirname, '../commands/utility/qotd.png');
 
 //cronjob for configured schedule, default 00:00 UTC
 export function startQotdScheduler(client) {
@@ -78,7 +78,7 @@ export function startQotdScheduler(client) {
             `${next.question}\n\n` +
             `🪑 **Submitted by:** <@${next.userId}>\n\n` +
             `💬 Reply below with your answer!`,
-          files: [imagePath],
+          files: [QOTD_IMAGE],
         },
       });
 
