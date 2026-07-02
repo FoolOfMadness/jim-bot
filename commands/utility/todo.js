@@ -189,6 +189,19 @@ async function updateListThread(client, state, config) {
   await message.edit(renderList(state.tasks, config, '#'));
 }
 
+function containsLink(text) {
+  const patterns = [
+    /https?:\/\/\S+/i,
+    /www\.\S+/i,
+    /discord\.gg\/\S+/i,
+    /discord(?:app)?\.com\/invite\/\S+/i,
+    /cdn\.discordapp\.com\/\S+/i,
+    /media\.discordapp\.net\/\S+/i,
+    /discord(?:app)?\.com\/channels\/\S+/i,
+  ];
+  return patterns.some((regex) => regex.test(text));
+}
+
 //todo
 export async function execute(interaction) {
   const group = interaction.options.getSubcommandGroup(false);
@@ -202,6 +215,14 @@ export async function execute(interaction) {
     const optionName = listType === 'media' ? 'title' : 'task';
     const text = interaction.options.getString(optionName).trim();
 
+    //link/embed validation
+    if (containsLink(text)) {
+      return interaction.reply({
+        content:
+          '❌ Links and Discord attachments are not allowed.\n\nPlease enter only the name or description.',
+        flags: EPHEMERAL_FLAG,
+      });
+    }
     state.tasks.push({
       id: ++state.lastTaskId,
       text,
