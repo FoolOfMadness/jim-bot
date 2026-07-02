@@ -3,7 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import {
+  EPHEMERAL_FLAG,
+  MAX_OPTION_LENGTH,
+  MAX_QUESTION_LENGTH,
+  ALLOWED_EXTENSIONS,
+  ALLOWED_MIME_TYPES,
+} from '../../constants/discordDefinitions.js';
 import { MOD_CHANNEL_ID } from '../../constants/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -53,28 +59,6 @@ export const execute = async (interaction) => {
   //inputs
   const question = interaction.options.getString('question')?.trim();
   const image = interaction.options.getAttachment('image');
-
-  const MAX_QUESTION_LENGTH = 300;
-  const MAX_OPTION_LENGTH = 55;
-
-  const ALLOWED_MIME_TYPES = new Set([
-    'image/png',
-    'image/jpeg',
-    'image/gif',
-    'image/webp',
-    'video/mp4',
-    'video/webm',
-  ]);
-
-  const ALLOWED_EXTENSIONS = [
-    '.png',
-    '.jpg',
-    '.jpeg',
-    '.gif',
-    '.webp',
-    '.mp4',
-    '.webm',
-  ];
 
   //validate attachment
   function isValidAttachment(file) {

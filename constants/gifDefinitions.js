@@ -1,3 +1,4 @@
+//gif config for bonk/headpat/avatar manipulation
 export const GIF_CONFIG = {
   avatarSize: 256,
   fps: 15,

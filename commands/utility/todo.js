@@ -15,6 +15,61 @@ const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../../data/todoState.json');
 const mediaStatePath = path.join(__dirname, '../../data/mediaTodoState.json');
 
+//name of slash command & description
+export const data = new SlashCommandBuilder()
+  .setName('todo')
+  .setDescription('Manage server lists')
+  .addSubcommand((sub) =>
+    sub
+      .setName('add')
+      .setDescription('Add a task')
+      .addStringOption((option) =>
+        option.setName('task').setDescription('Task to add').setRequired(true)
+      )
+  )
+  .addSubcommand((sub) =>
+    sub
+      .setName('complete')
+      .setDescription('Jim only - finished task')
+      .addIntegerOption((option) =>
+        option.setName('id').setDescription('Task ID').setRequired(true)
+      )
+  )
+  .addSubcommand((sub) =>
+    sub.setName('list').setDescription('View the to-do list')
+  )
+  .addSubcommandGroup((group) =>
+    group
+      .setName('media')
+      .setDescription('Manage the watch list')
+
+      .addSubcommand((sub) =>
+        sub
+          .setName('add')
+          .setDescription('Add something to watch')
+          .addStringOption((option) =>
+            option
+              .setName('title')
+              .setDescription('Movie, show, anime, video, etc.')
+              .setRequired(true)
+          )
+      )
+      .addSubcommand((sub) =>
+        sub
+          .setName('complete')
+          .setDescription('Jim only - media added')
+          .addIntegerOption((option) =>
+            option
+              .setName('id')
+              .setDescription('Media item ID')
+              .setRequired(true)
+          )
+      )
+      .addSubcommand((sub) =>
+        sub.setName('list').setDescription('View the watch list')
+      )
+  );
+
 //default
 function getDefaultState() {
   return {
@@ -46,9 +101,11 @@ const LIST_CONFIGS = {
     threadName: "📋 Jim's To-Do List",
     emoji: '📋',
     addCommand: '/todo add',
-    emptyText: '_No tasks currently._',
-    listTitle: '## 📝 Community To-Do List',
-    emptyListText: '*Nothing has been added yet.*',
+    listTitle: "## 📝 Jim's Tasks",
+    pendingHeading: 'Pending',
+    completedHeading: 'Completed',
+    pendingEmpty: '_Nothing currently added._',
+    completedEmpty: '_Nothing completed yet._',
   },
   media: {
     statePath: mediaStatePath,
@@ -56,26 +113,30 @@ const LIST_CONFIGS = {
     threadName: "🎬 Jim's Jellyfin",
     emoji: '🎬',
     addCommand: '/todo media add',
-    emptyText: '_No media suggestions currently._',
-    listTitle: '## 🎬 Community Watch List',
-    emptyListText: '*Nothing has been suggested yet.*',
+    listTitle: '## 🎬 Buddy Watch List',
+    pendingHeading: 'Requested',
+    completedHeading: 'Added to Jellyfin',
+    pendingEmpty: '_No media requests currently._',
+    completedEmpty: '_Nothing has been added yet._',
   },
 };
 
 //render list
-function renderList(tasks, config) {
+function renderList(tasks, config, headingLevel = '##') {
   const addedTasks = tasks.filter((task) => !task.done);
-
   const completedTasks = tasks
     .filter((task) => task.done)
     .sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0));
+  let text = `${headingLevel === '#' ? '' : `${config.listTitle}\n\n`}`;
 
-  let text = `# ${config.emoji} ${config.title}\n\n`;
-  text += `Use \`${config.addCommand}\` to suggest new items.\n\n`;
-  text += `## Added\n\n`;
+  if (headingLevel === '#') {
+    text += `# ${config.emoji} ${config.title}\n\n`;
+    text += `Use \`${config.addCommand}\` to suggest new items.\n\n`;
+  }
+  text += `${headingLevel} ${config.pendingHeading}\n\n`;
 
   if (!addedTasks.length) {
-    text += '_Nothing currently added._\n\n';
+    text += `${config.pendingEmpty}\n\n`;
   } else {
     for (const task of addedTasks) {
       text +=
@@ -84,10 +145,10 @@ function renderList(tasks, config) {
     }
   }
   text += `---\n\n`;
-  text += `## Completed\n\n`;
+  text += `${headingLevel} ${config.completedHeading}\n\n`;
 
   if (!completedTasks.length) {
-    text += '_Nothing completed yet._';
+    text += config.completedEmpty;
   } else {
     for (const task of completedTasks) {
       text +=
@@ -109,7 +170,7 @@ async function updateListThread(client, state, config) {
       name: config.threadName,
       appliedTags: [TODO_TAG_ID],
       message: {
-        content: renderList(state.tasks, config),
+        content: renderList(state.tasks, config, '#'),
       },
     });
     state.threadId = thread.id;
@@ -121,63 +182,8 @@ async function updateListThread(client, state, config) {
   thread = await forum.threads.fetch(state.threadId);
   const message = await thread.messages.fetch(state.messageId);
 
-  await message.edit(renderList(state.tasks, config));
+  await message.edit(renderList(state.tasks, config, '#'));
 }
-
-//name of slash command & description
-export const data = new SlashCommandBuilder()
-  .setName('todo')
-  .setDescription('Manage server lists')
-  .addSubcommand((sub) =>
-    sub
-      .setName('add')
-      .setDescription('Add a task')
-      .addStringOption((option) =>
-        option.setName('task').setDescription('Task to add').setRequired(true)
-      )
-  )
-  .addSubcommand((sub) =>
-    sub
-      .setName('complete')
-      .setDescription('Mark a task complete')
-      .addIntegerOption((option) =>
-        option.setName('id').setDescription('Task ID').setRequired(true)
-      )
-  )
-  .addSubcommand((sub) =>
-    sub.setName('list').setDescription('View the to-do list')
-  )
-  .addSubcommandGroup((group) =>
-    group
-      .setName('media')
-      .setDescription('Manage the watch list')
-
-      .addSubcommand((sub) =>
-        sub
-          .setName('add')
-          .setDescription('Add something to watch')
-          .addStringOption((option) =>
-            option
-              .setName('title')
-              .setDescription('Movie, show, anime, video, etc.')
-              .setRequired(true)
-          )
-      )
-      .addSubcommand((sub) =>
-        sub
-          .setName('complete')
-          .setDescription('Mark a media item as watched')
-          .addIntegerOption((option) =>
-            option
-              .setName('id')
-              .setDescription('Media item ID')
-              .setRequired(true)
-          )
-      )
-      .addSubcommand((sub) =>
-        sub.setName('list').setDescription('View the watch list')
-      )
-  );
 
 //todo
 export async function execute(interaction) {
@@ -187,6 +193,7 @@ export async function execute(interaction) {
   const config = LIST_CONFIGS[listType];
   const state = loadState(config.statePath);
 
+  //add item to json
   if (sub === 'add') {
     const optionName = listType === 'media' ? 'title' : 'task';
     const text = interaction.options.getString(optionName).trim();
@@ -199,9 +206,11 @@ export async function execute(interaction) {
       done: false,
       createdAt: Date.now(),
     });
+    //save json & update thread
     saveState(config.statePath, state);
     await updateListThread(interaction.client, state, config);
 
+    //confirm item added to list
     return interaction.reply({
       content:
         listType === 'media'
@@ -210,6 +219,7 @@ export async function execute(interaction) {
       flags: EPHEMERAL_FLAG,
     });
   }
+  //jim check item off list
   if (sub === 'complete') {
     if (interaction.user.id !== BOT_OWNER_ID) {
       return interaction.reply({
@@ -233,6 +243,7 @@ export async function execute(interaction) {
     saveState(config.statePath, state);
     await updateListThread(interaction.client, state, config);
 
+    //confirm item completed
     return interaction.reply({
       content:
         listType === 'media'
@@ -241,33 +252,13 @@ export async function execute(interaction) {
       flags: EPHEMERAL_FLAG,
     });
   }
-
+  //send ephemeral list to user
   if (sub === 'list') {
-    const addedTasks = state.tasks.filter((task) => !task.done);
-    const completedTasks = state.tasks.filter((task) => task.done);
-    let content = `${config.listTitle}\n\n`;
-    content += `### Added\n\n`;
-
-    if (!addedTasks.length) {
-      content += '*Nothing currently added.*\n\n';
-    } else {
-      for (const task of addedTasks) {
-        content += `${task.id}. ${task.text}\n`;
-      }
-      content += '\n';
+    if (sub === 'list') {
+      return interaction.reply({
+        content: renderList(state.tasks, config, '###'),
+        flags: EPHEMERAL_FLAG,
+      });
     }
-    content += `### Completed\n\n`;
-
-    if (!completedTasks.length) {
-      content += '*Nothing completed yet.*';
-    } else {
-      for (const task of completedTasks) {
-        content += `~~${task.id}. ${task.text}~~\n`;
-      }
-    }
-    return interaction.reply({
-      content,
-      flags: EPHEMERAL_FLAG,
-    });
   }
 }
