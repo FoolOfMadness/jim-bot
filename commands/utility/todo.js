@@ -14,7 +14,7 @@ import { TODO_IMAGE, MEDIA_IMAGE } from '../../constants/assets.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const todoStatePath = path.join(__dirname, '../../data/todoState.json');
-const mediaStatePath = path.join(__dirname, '../../data/mediaTodoState.json');
+const mediaStatePath = path.join(__dirname, '../../data/mediaState.json');
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
