@@ -70,8 +70,12 @@ web_modules/
 .env.*
 !.env.example
 
-#Quote of the Day State example
+#Quote of the Day State
 qotdState.json
+
+#List State
+todoState.json
+mediaState.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
