@@ -1,6 +1,7 @@
 //set bot activity status command
 import { SlashCommandBuilder, ActivityType } from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { BOT_OWNER_ID } from '../../constants/env.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
@@ -28,7 +29,7 @@ export const data = new SlashCommandBuilder()
   );
 //if not Jim message
 export const execute = async (interaction) => {
-  if (interaction.user.id != '240246252124504064') {
+  if (interaction.user.id != BOT_OWNER_ID) {
     await interaction.reply({
       content: "You're not Jim. You will never be Jim.",
       flags: EPHEMERAL_FLAG,

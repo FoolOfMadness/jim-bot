@@ -24,13 +24,15 @@ function optionalEnvArray(name) {
   );
 }
 
+export const BOT_OWNER_ID = requiredEnv('BOT_OWNER_ID');
+
 export const MOD_CHANNEL_ID = requiredEnv('MOD_CHANNEL_ID');
 
 export const ANNOUNCEMENT_CHANNEL_IDS = optionalEnvArray(
   'ANNOUNCEMENT_CHANNEL_IDS'
 );
 
-export const QOTD_FORUM_CHANNEL_ID = requiredEnv('QOTD_FORUM_CHANNEL_ID');
+export const FORUM_CHANNEL_ID = requiredEnv('FORUM_CHANNEL_ID');
 export const QOTD_TAG_ID = requiredEnv('QOTD_TAG_ID');
 export const QOTD_ROLE_ID = requiredEnv('QOTD_ROLE_ID');
 
@@ -38,5 +40,7 @@ export const QOTD_CRON_SCHEDULE = optionalEnv(
   'QOTD_CRON_SCHEDULE',
   '0 0 * * *'
 );
+
+export const TODO_TAG_ID = requiredEnv('TODO_TAG_ID');
 
 export const MONTHLY_CHANNEL_ID = requiredEnv('MONTHLY_CHANNEL_ID');

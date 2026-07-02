@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
-  QOTD_FORUM_CHANNEL_ID,
+  FORUM_CHANNEL_ID,
   QOTD_TAG_ID,
   QOTD_ROLE_ID,
   QOTD_CRON_SCHEDULE,
@@ -40,7 +40,7 @@ export function startQotdScheduler(client) {
       state.queue ||= [];
 
       //fetch forum
-      const forum = await client.channels.fetch(QOTD_FORUM_CHANNEL_ID);
+      const forum = await client.channels.fetch(FORUM_CHANNEL_ID);
       if (!forum?.threads) {
         console.log('Forum channel not found');
         return;
