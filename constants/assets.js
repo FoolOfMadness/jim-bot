@@ -25,4 +25,4 @@ export const MONTHLY_VIDEO = requiredAsset(
 
 export const HEADPAT_GIF = requiredAsset(path.join(ASSETS_DIR, 'headpat.gif'));
 
-export const QOTD_IMAGE = requiredAsset(path.join(ASSETS_DIR, 'qotd.jpg'));
+export const QOTD_IMAGE = requiredAsset(path.join(ASSETS_DIR, 'qotd.png'));

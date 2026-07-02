@@ -15,35 +15,46 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../utils/qotdState.json');
 
+//resolve image or use default
+function resolveImage(image) {
+  if (!image) return QOTD_IMAGE;
+  if (typeof image === 'string') return image;
+  if (image?.url) return image.url;
+  return QOTD_IMAGE;
+}
+
 //cronjob for configured schedule, default 00:00 UTC
 export function startQotdScheduler(client) {
   cron.schedule(QOTD_CRON_SCHEDULE, async () => {
     console.log('🌅 Running QOTD scheduler');
 
     try {
-      //load queue & find forum
-      const state = JSON.parse(fs.readFileSync(statePath, 'utf8') || '{}');
+      //load state safely
+      const raw = fs.readFileSync(statePath, 'utf8') || '{}';
+      const state = {
+        lastQuestionNumber: 0,
+        queue: [],
+        activeThreadId: null,
+        ...JSON.parse(raw),
+      };
+      state.queue ||= [];
 
-      state.queue = state.queue || [];
-
+      //fetch forum
       const forum = await client.channels.fetch(QOTD_FORUM_CHANNEL_ID);
-      console.log('Forum found:', !!forum);
-
-      if (!forum || !forum.threads) {
-        console.log('Forum channel not found.');
+      if (!forum?.threads) {
+        console.log('Forum channel not found');
         return;
       }
-      //close previous qotd
+
+      //close & lock old thread
       if (state.activeThreadId) {
         try {
           const oldThread = await forum.threads.fetch(state.activeThreadId);
-
           if (oldThread) {
-            //lock & archive
-            if (!oldThread.name.startsWith('🔒')) {
-              await oldThread.setName(`🔒 ${oldThread.name}`);
-            }
-
+            const newName = oldThread.name.startsWith('🔒')
+              ? oldThread.name
+              : `🔒 ${oldThread.name}`;
+            await oldThread.setName(newName);
             await oldThread.setLocked(true);
             await oldThread.setArchived(true);
           }
@@ -51,19 +62,25 @@ export function startQotdScheduler(client) {
           console.log('Old thread missing or already archived');
         }
       }
-
-      //shift next qotd from json
+      //get next qotd
       const next = state.queue.shift();
-
       if (!next) {
         console.log('No queued QOTD');
         fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
         return;
       }
+      //save immediately
+      fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
 
-      //increment number
+      //increment qotd number
       state.lastQuestionNumber = (state.lastQuestionNumber || 0) + 1;
       const qNum = state.lastQuestionNumber;
+      const image = resolveImage(next.image);
+
+      //clean poll options
+      const answers = (next.options || [])
+        .map((o) => o?.trim())
+        .filter((o) => o && o.length <= 55);
 
       //create thread
       const thread = await forum.threads.create({
@@ -78,26 +95,26 @@ export function startQotdScheduler(client) {
             `${next.question}\n\n` +
             `🪑 **Submitted by:** <@${next.userId}>\n\n` +
             `💬 Reply below with your answer!`,
-          files: [QOTD_IMAGE],
+          files: [image],
         },
       });
-
-      //poll if needed
-      if (next.options?.length >= 2) {
+      //send poll
+      if (answers.length >= 2) {
         await thread.send({
           poll: {
-            question: { text: next.question },
-            answers: next.options.map((option) => ({ text: option })),
+            question: {
+              text: next.question.slice(0, 300),
+            },
+            answers: answers.map((text) => ({ text })),
             duration: 24,
             allowMultiselect: false,
           },
         });
       }
-
-      //update threadID & save
+      //save active thread
       state.activeThreadId = thread.id;
+      //save incremented number
       fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
-
       console.log(`Posted QOTD #${qNum}`);
     } catch (err) {
       console.error('QOTD scheduler error:', err);
