@@ -9,10 +9,11 @@ import {
   BOT_OWNER_ID,
   TODO_TAG_ID,
 } from '../../constants/env.js';
+import { TODO_IMAGE, MEDIA_IMAGE } from '../../constants/assets.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const statePath = path.join(__dirname, '../../data/todoState.json');
+const todoStatePath = path.join(__dirname, '../../data/todoState.json');
 const mediaStatePath = path.join(__dirname, '../../data/mediaTodoState.json');
 
 //name of slash command & description
@@ -99,6 +100,7 @@ const LIST_CONFIGS = {
     statePath: todoStatePath,
     title: "Jim's To-Do List",
     threadName: "📋 Jim's To-Do List",
+    image: TODO_IMAGE,
     emoji: '📋',
     addCommand: '/todo add',
     listTitle: "## 📝 Jim's Tasks",
@@ -111,6 +113,7 @@ const LIST_CONFIGS = {
     statePath: mediaStatePath,
     title: "Jim's Media List",
     threadName: "🎬 Jim's Jellyfin",
+    image: MEDIA_IMAGE,
     emoji: '🎬',
     addCommand: '/todo media add',
     listTitle: '## 🎬 Buddy Watch List',
@@ -171,6 +174,7 @@ async function updateListThread(client, state, config) {
       appliedTags: [TODO_TAG_ID],
       message: {
         content: renderList(state.tasks, config, '#'),
+        files: [config.image],
       },
     });
     state.threadId = thread.id;
