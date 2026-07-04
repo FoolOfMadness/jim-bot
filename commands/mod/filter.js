@@ -42,7 +42,7 @@ export const data = new SlashCommandBuilder()
 
 //try catch block for subcommands
 export const execute = async (interaction) => {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: EPHEMERAL_FLAG });
 
   if (interaction.options.getSubcommand() === 'add') {
     try {

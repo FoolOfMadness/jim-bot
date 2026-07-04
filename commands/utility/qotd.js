@@ -10,7 +10,7 @@ import {
   ALLOWED_EXTENSIONS,
   ALLOWED_MIME_TYPES,
 } from '../../constants/discordDefinitions.js';
-import { MOD_CHANNEL_ID } from '../../constants/env.js';
+import { sendModAlert } from '../../utils/modAlerts.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -171,20 +171,18 @@ export const execute = async (interaction) => {
   await interaction.editReply({ embeds: [embed] });
 
   //send to mod channel
-  try {
-    const modChannel = await interaction.client.channels.fetch(MOD_CHANNEL_ID);
-
-    if (modChannel) {
-      if (imageUrl) {
-        await modChannel.send({
-          embeds: [embed],
-          files: [imageUrl],
-        });
-      } else {
-        await modChannel.send({ embeds: [embed] });
-      }
-    }
-  } catch (err) {
-    console.error('Failed to send mod alert:', err);
-  }
+  await sendModAlert(interaction.client, {
+    type: 'qotd.queue',
+    user: {
+      id: queueItem.userId,
+      avatar: queueItem.avatar,
+    },
+    content: queueItem.question,
+    meta: {
+      isPoll,
+      options,
+      hasAttachment,
+      position,
+    },
+  });
 };

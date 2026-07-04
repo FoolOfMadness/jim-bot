@@ -1,6 +1,7 @@
 {
   "threadId": "",
   "messageId": "",
+  "completedLogMessageID": "",
   "lastTaskId": 0,
   "tasks": []
 }

@@ -47,7 +47,16 @@ for (const entry of commandEntries) {
       const filePath = join(fullPath, file);
       const command = await import(`file://${filePath}`);
       if ('data' in command && 'execute' in command) {
-        commands.push(command.data.toJSON());
+        console.log(`Building command: ${file}`);
+        try {
+          const json = command.data.toJSON();
+          commands.push(json);
+          console.log(`OK: ${command.data.name ?? file}`);
+        } catch (err) {
+          console.error(`FAILED COMMAND: ${file}`);
+          console.error(err);
+          throw err;
+        }
       } else {
         console.warn(
           `[WARNING] The command at ${filePath} is missing "data" or "execute".`
@@ -58,7 +67,16 @@ for (const entry of commandEntries) {
     //if file is command, load directly
     const command = await import(`file://${fullPath}`);
     if ('data' in command && 'execute' in command) {
-      commands.push(command.data.toJSON());
+      console.log(`Building root command: ${entry}`);
+      try {
+        const json = command.data.toJSON();
+        commands.push(json);
+        console.log(`OK: ${command.data.name ?? entry}`);
+      } catch (err) {
+        console.error(`FAILED COMMAND: ${entry}`);
+        console.error(err);
+        throw err;
+      }
     } else {
       console.warn(
         `[WARNING] The command at ${fullPath} is missing "data" or "execute".`

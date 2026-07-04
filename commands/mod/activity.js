@@ -1,12 +1,16 @@
 //set bot activity status command
-import { SlashCommandBuilder, ActivityType } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  ActivityType,
+  PermissionFlagsBits,
+} from 'discord.js';
 import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { BOT_OWNER_ID } from '../../constants/env.js';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('activity')
-  .setDescription('Set activity (developer only)')
+  .setDescription('Set activity (admin only)')
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
   .addStringOption((option) =>
     option
       .setName('type')
@@ -27,16 +31,14 @@ export const data = new SlashCommandBuilder()
       .setDescription('The details of the activity')
       .setRequired(true)
   );
-//if not Jim message
+//if not admin message
 export const execute = async (interaction) => {
-  if (interaction.user.id != BOT_OWNER_ID) {
-    await interaction.reply({
-      content: "You're not Jim. You will never be Jim.",
+  if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+    return interaction.reply({
+      content: '❌ Admin only.',
       flags: EPHEMERAL_FLAG,
     });
-    return;
   }
-
   await interaction.deferReply({ flags: EPHEMERAL_FLAG });
 
   //define activity type
@@ -47,6 +49,7 @@ export const execute = async (interaction) => {
   if (activity_type === 'streaming') activity_type = ActivityType.Streaming;
   if (activity_type === 'competing') activity_type = ActivityType.Competing;
 
+  //set activity
   interaction.client.user.setActivity(
     interaction.options.getString('details'),
     { type: activity_type }
