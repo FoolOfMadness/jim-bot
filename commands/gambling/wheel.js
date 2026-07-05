@@ -6,8 +6,8 @@ import {
 } from 'discord.js';
 import { createCanvas } from 'canvas';
 import GIFEncoder from 'gifencoder';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { lockGif, unlockGif } from '../../utils/gifLock.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { lockGif, unlockGif } from '#utils/gifLock';
 
 //config variables
 const WHEEL_SIZE = 400;

@@ -1,6 +1,6 @@
 //autopublish announcements from announcement channels
 import { Events, ChannelType } from 'discord.js';
-import { ANNOUNCEMENT_CHANNEL_IDS } from '../constants/env.js';
+import { ANNOUNCEMENT_CHANNEL_IDS } from '#constants/env';
 
 export const name = Events.MessageCreate;
 export /**

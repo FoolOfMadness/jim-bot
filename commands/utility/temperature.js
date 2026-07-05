@@ -1,7 +1,7 @@
 //temperature conversion command
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { convertTemperature } from '../../utils/convertTemperature.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { convertTemperature } from '#utils/convertTemperature';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

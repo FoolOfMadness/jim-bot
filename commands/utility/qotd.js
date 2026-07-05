@@ -9,12 +9,12 @@ import {
   MAX_QUESTION_LENGTH,
   ALLOWED_EXTENSIONS,
   ALLOWED_MIME_TYPES,
-} from '../../constants/discordDefinitions.js';
-import { sendModAlert } from '../../utils/modAlerts.js';
+} from '#constants/discordDefinitions';
+import { sendModAlert } from '#utils/modAlerts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const statePath = path.join(__dirname, '../../data/qotdState.json');
+const statePath = path.join(__dirname, '../data/qotdState.json');
 
 //name of slash command & description
 export const data = (() => {
@@ -178,6 +178,7 @@ export const execute = async (interaction) => {
       avatar: queueItem.avatar,
     },
     content: queueItem.question,
+    file: imageUrl,
     meta: {
       isPoll,
       options,

@@ -1,7 +1,9 @@
 //timestamp command
 import { SlashCommandBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 import moment from 'moment-timezone';
+
+//timezone shortcut
 const _tz = moment.tz;
 
 //name of slash command & description

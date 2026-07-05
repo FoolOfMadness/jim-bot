@@ -8,9 +8,9 @@ import {
   ComponentType,
   EmbedBuilder,
 } from 'discord.js';
-import { chooseWithProbabilities } from '../../utils/randomUtil.js';
 import { gomenasorry } from '../fun/gomenasorry.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { chooseWithProbabilities } from '#utils/randomUtil';
 
 //name of slash commands, subcommands, & descriptions
 export const data = new SlashCommandBuilder()

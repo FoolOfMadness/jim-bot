@@ -1,7 +1,7 @@
 //daily qotd poster
 import cron from 'node-cron';
-import { QOTD_CRON_SCHEDULE } from '../constants/env.js';
-import { postNextQotd } from '../utils/qotdUtils.js';
+import { QOTD_CRON_SCHEDULE } from '#constants/env';
+import { postNextQotd } from '#utils/qotdUtils';
 
 //post the qotd
 export function startQotdScheduler(client) {

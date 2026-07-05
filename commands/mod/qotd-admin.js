@@ -3,12 +3,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { postNextQotd } from '../../utils/qotdUtils.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { postNextQotd } from '#utils/qotdUtils';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const statePath = path.join(__dirname, '../../data/qotdState.json');
+const statePath = path.join(__dirname, '../data/qotdState.json');
 
 //load state
 function loadState() {

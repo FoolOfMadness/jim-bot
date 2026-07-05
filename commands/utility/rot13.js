@@ -4,7 +4,7 @@ import {
   ContextMenuCommandBuilder,
   ApplicationCommandType,
 } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

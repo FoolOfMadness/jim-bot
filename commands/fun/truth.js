@@ -1,8 +1,8 @@
 //red & blue truth umineko command
 import { createCanvas, loadImage } from 'canvas';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { BG_GIF } from '../../constants/assets.js';
+import { BG_GIF } from '#constants/assets';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

@@ -1,13 +1,13 @@
 //todo-admin
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 import {
   loadState,
   saveState,
   upsertThread,
   upsertCompletedLog,
   TODO_CONFIG,
-} from '../../utils/todoUtils.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+} from '#utils/todoUtils';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

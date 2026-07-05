@@ -1,5 +1,6 @@
 import { Events, GuildMember } from 'discord.js';
 import { extremePunish } from '../commands/mod/punish.js';
+import { JIMPREG_IMAGE } from '#constants/assets';
 
 /**
  * @typedef Message
@@ -23,6 +24,14 @@ export async function execute(message) {
       !message.client.bannedWords
     )
       return;
+
+    //jimpreg trigger
+    if (/jim[\s-]?preg/i.test(message.content)) {
+      await message.reply({
+        files: [JIMPREG_IMAGE],
+      });
+      return;
+    }
 
     if (activePunishments.has(message.member.id)) return;
 

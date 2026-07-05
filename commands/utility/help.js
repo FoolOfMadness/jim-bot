@@ -1,6 +1,6 @@
 //help command to explain other JimBot commands
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 
 //label categories
 const categoryLabels = {

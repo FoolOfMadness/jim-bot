@@ -1,6 +1,6 @@
 {
   "name": "jim-bot",
-  "version": "0.9.9",
+  "version": "0.9.91",
   "description": "Jim's very cool Discord bot",
   "type": "module",
   "main": "index.js",
@@ -26,5 +26,10 @@
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "yargs": "^17.7.2"
+  },
+  "imports": {
+    "#constants/*": "./constants/*.js",
+    "#utils/*": "./utils/*.js",
+    "#temporal/*": "./temporal/*.js"
   }
 }

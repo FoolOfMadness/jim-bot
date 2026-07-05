@@ -2,8 +2,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { TODO_FORUM_CHANNEL_ID, TODO_TAG_ID } from '../constants/env.js';
-import { TODO_IMAGE, MEDIA_IMAGE } from '../constants/assets.js';
+import { TODO_IMAGE, MEDIA_IMAGE } from '#constants/assets';
+import { TODO_FORUM_CHANNEL_ID, TODO_TAG_ID } from '#constants/env';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

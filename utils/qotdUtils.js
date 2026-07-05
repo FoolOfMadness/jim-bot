@@ -2,12 +2,12 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { QOTD_IMAGE } from '#constants/assets';
 import {
   QOTD_FORUM_CHANNEL_ID,
   QOTD_TAG_ID,
   QOTD_ROLE_ID,
-} from '../constants/env.js';
-import { QOTD_IMAGE } from '../constants/assets.js';
+} from '#constants/env';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

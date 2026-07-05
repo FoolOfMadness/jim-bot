@@ -1,8 +1,8 @@
 //monthly post scheduler
 import cron from 'node-cron';
 import { EmbedBuilder } from 'discord.js';
-import { MONTHLY_CHANNEL_ID, MONTHLY_CRON_SCHEDULE } from '../constants/env.js';
-import { MONTHLY_VIDEO } from '../constants/assets.js';
+import { MONTHLY_CHANNEL_ID, MONTHLY_CRON_SCHEDULE } from '#constants/env';
+import { MONTHLY_VIDEO } from '#constants/assets';
 
 //post the video
 export function startMonthlyScheduler(client) {

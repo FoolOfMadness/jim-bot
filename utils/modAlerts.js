@@ -1,6 +1,6 @@
 //mod alerts utility
 import { EmbedBuilder } from 'discord.js';
-import { MOD_CHANNEL_ID } from '../constants/env.js';
+import { MOD_CHANNEL_ID } from '#constants/env';
 
 async function getModChannel(client) {
   try {
@@ -17,8 +17,11 @@ export async function sendModAlert(client, payload) {
   if (!modChannel) return;
 
   const embed = buildEmbed(payload);
-
   if (!embed) return;
+
+  if (payload.file) {
+    message.files = [payload.file];
+  }
 
   await modChannel.send({ embeds: [embed] });
 }

@@ -2,10 +2,10 @@
 import canvasGif from 'canvas-gif';
 import { loadImage, createCanvas } from 'canvas';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
-import { EPHEMERAL_FLAG } from '../../constants/discordDefinitions.js';
-import { GIF_CONFIG } from '../../constants/gifDefinitions.js';
-import { lockGif, unlockGif } from '../../utils/gifLock.js';
-import { HEADPAT_GIF } from '../../constants/assets.js';
+import { HEADPAT_GIF } from '#constants/assets';
+import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { GIF_CONFIG } from '#constants/gifDefinitions';
+import { lockGif, unlockGif } from '#utils/gifLock';
 
 //name of slash command & description
 export const data = new SlashCommandBuilder()

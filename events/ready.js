@@ -1,7 +1,7 @@
 //confirm bot ready status
 import { Events } from 'discord.js';
-import { startQotdScheduler } from '../temporal/qotdScheduler.js';
-import { startMonthlyScheduler } from '../temporal/monthlyScheduler.js';
+import { startQotdScheduler } from '#temporal/qotdScheduler';
+import { startMonthlyScheduler } from '#temporal/monthlyScheduler';
 
 export const name = Events.ClientReady;
 export const once = true;
