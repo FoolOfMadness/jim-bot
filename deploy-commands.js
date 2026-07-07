@@ -7,6 +7,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
+import { MAIN_GUILD_ID, DEV_GUILD_ID, TOKEN, CLIENT_ID } from '#constants/env';
 
 //resolve __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -16,17 +17,15 @@ const __dirname = dirname(__filename);
 const argv = yargs(hideBin(process.argv)).parse();
 
 //load environment variables
-const token = process.env.TOKEN;
-const clientId = process.env.CLIENT_ID;
 let guildId;
 let deploymentMessage;
 
 if (argv.deploy) {
-  guildId = process.env.MAIN_GUILD_ID;
-  deploymentMessage = "Deploying to Nai's server";
+  guildId = MAIN_GUILD_ID;
+  deploymentMessage = "Deploying to Jim's server";
 } else {
-  guildId = process.env.DEV_GUILD_ID;
-  deploymentMessage = "Deploying to Jim's Server";
+  guildId = DEV_GUILD_ID;
+  deploymentMessage = "Deploying to Nai's Server";
 }
 
 //load commands
@@ -86,7 +85,7 @@ for (const entry of commandEntries) {
 }
 
 //deploy commands
-const rest = new REST({ version: '10' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 try {
   console.log(deploymentMessage);
@@ -95,7 +94,7 @@ try {
   );
 
   const data = await rest.put(
-    Routes.applicationGuildCommands(clientId, guildId),
+    Routes.applicationGuildCommands(CLIENT_ID, guildId),
     { body: commands }
   );
 

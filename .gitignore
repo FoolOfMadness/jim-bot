@@ -70,6 +70,9 @@ web_modules/
 .env.*
 !.env.example
 
+#Scrandle
+scranState.json
+
 #Quote of the Day State
 qotdState.json
 

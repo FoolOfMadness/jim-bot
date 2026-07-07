@@ -12,7 +12,7 @@ import {
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('todo-admin')
-  .setDescription('Admin controls for todo system')
+  .setDescription('Admin controls for todo lists')
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
   .addSubcommand((sub) =>
     sub

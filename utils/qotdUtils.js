@@ -48,7 +48,13 @@ export async function postNextQotd(client) {
         await oldThread.setLocked(true);
         await oldThread.setArchived(true);
       }
-    } catch {}
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({
+        content: 'Something went wrong while archiving previous QotD...',
+        flags: EPHEMERAL_FLAG,
+      });
+    }
   }
   //move next item
   const next = state.queue.shift();
@@ -63,8 +69,8 @@ export async function postNextQotd(client) {
   const image = resolveImage(next.image);
 
   const answers = (next.options || [])
-    .map((o) => o?.trim())
-    .filter((o) => o && o.length <= 55);
+    .map((option) => option?.trim())
+    .filter((option) => option && option.length <= 55);
 
   //create post
   const thread = await forum.threads.create({

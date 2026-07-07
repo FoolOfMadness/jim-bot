@@ -5,7 +5,7 @@ import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('user')
-  .setDescription('Provides information about the user.');
+  .setDescription('Provides information about the user');
 
 export const execute = async (interaction) => {
   await interaction.reply({

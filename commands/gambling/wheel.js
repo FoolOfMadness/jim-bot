@@ -426,7 +426,7 @@ function colourToRgb(color) {
       return { r, g, b };
     }
   } catch {
-    //fallback
+    console.error(error);
+    return { r: 255, g: 255, b: 255 };
   }
-  return { r: 255, g: 255, b: 255 };
 }

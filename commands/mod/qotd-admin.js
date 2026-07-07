@@ -8,7 +8,7 @@ import { postNextQotd } from '#utils/qotdUtils';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const statePath = path.join(__dirname, '../data/qotdState.json');
+const statePath = path.join(__dirname, '../../data/qotdState.json');
 
 //load state
 function loadState() {

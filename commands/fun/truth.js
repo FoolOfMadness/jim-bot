@@ -7,14 +7,14 @@ import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('truth')
-  .setDescription('Speak your truth.')
+  .setDescription('Speak your truth')
   .addStringOption((option) =>
-    option.setName('truth').setDescription('Your truth.').setRequired(true)
+    option.setName('truth').setDescription('Your truth').setRequired(true)
   )
   .addStringOption((option) =>
     option
       .setName('color')
-      .setDescription('Choose your text color (red or blue).')
+      .setDescription('Choose your text color (red or blue)')
       .addChoices(
         { name: 'red', value: 'red' },
         { name: 'blue', value: '#0ac2ff' }

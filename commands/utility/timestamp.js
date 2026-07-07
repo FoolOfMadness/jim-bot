@@ -9,9 +9,7 @@ const _tz = moment.tz;
 //name of slash command & description
 export const data = new SlashCommandBuilder()
   .setName('timestamp')
-  .setDescription(
-    "Convert your timezone's date & time to a timestamp (default current time & date)"
-  )
+  .setDescription("Convert your timezone's date & time to a timestamp")
   .addStringOption((option) =>
     option
       .setName('timezone')

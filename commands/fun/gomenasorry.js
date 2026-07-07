@@ -11,7 +11,7 @@ export const gomenasorry = [
 //name of slash command, description, &  variants
 export const data = new SlashCommandBuilder()
   .setName('gomenasorry')
-  .setDescription('Apologises properly.')
+  .setDescription('Apologises properly')
   .addStringOption((option) =>
     option
       .setName('variant')

@@ -9,16 +9,13 @@ import {
   Client,
   Collection,
   GatewayIntentBits,
+  Partials,
 } from 'discord.js';
+import { TOKEN, DEBUG, DB_PASS } from '#constants/env';
 
 //resolve __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-//environment variables
-const TOKEN = process.env.TOKEN;
-const DEBUG = process.env.DEBUG === 'true';
-const DB_PASS = process.env.DB_PASS;
 
 //client setup
 const client = new Client({
@@ -26,7 +23,9 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
   ],
+  partials: [Partials.Message, Partials.Reaction],
   presence: {
     activities: [{ name: '/help', type: ActivityType.Listening }],
   },
@@ -39,7 +38,7 @@ client.cooldowns = new Collection();
 const sequelize = new Sequelize('database', 'admin', DB_PASS, {
   host: 'localhost',
   dialect: 'sqlite',
-  logging: DEBUG,
+  logging: DEBUG ? console.log : false,
   storage: 'database.sqlite',
 });
 
