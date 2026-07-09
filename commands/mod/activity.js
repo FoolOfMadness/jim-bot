@@ -58,6 +58,5 @@ export const execute = async (interaction) => {
   //confirm
   await interaction.editReply({
     content: 'Activity updated successfully',
-    flags: EPHEMERAL_FLAG,
   });
 };

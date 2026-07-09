@@ -76,6 +76,9 @@ scranState.json
 #Quote of the Day State
 qotdState.json
 
+#QOTD attachments
+assets/qotd-attachments/*
+
 #List State
 todoState.json
 mediaState.json

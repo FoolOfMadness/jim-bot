@@ -15,6 +15,7 @@ import { sendModAlert } from '#utils/modAlerts';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const statePath = path.join(__dirname, '../../data/qotdState.json');
+const attachmentPath = path.join(__dirname, '../../assets/qotd-attachments');
 
 //name of slash command & description
 export const data = (() => {
@@ -71,9 +72,7 @@ export const execute = async (interaction) => {
   }
   if (!isValidAttachment(image)) {
     return interaction.editReply({
-      content:
-        '❌ Unsupported file type.\n\nAllowed: PNG, JPG, GIF, WEBP, MP4, WEBM',
-      flags: EPHEMERAL_FLAG,
+      content: '❌ Unsupported file type.',
     });
   }
 
@@ -89,7 +88,6 @@ export const execute = async (interaction) => {
       content:
         `❌ Questions cannot exceed **${MAX_QUESTION_LENGTH} characters**.\n` +
         `Current length: **${question.length}**.`,
-      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -108,14 +106,37 @@ export const execute = async (interaction) => {
         content:
           `❌ **Poll option ${i + 1}** exceeds **${MAX_OPTION_LENGTH} characters**.\n` +
           `Current length: **${options[i].length}**.`,
-        flags: EPHEMERAL_FLAG,
       });
     }
   }
 
-  //store image url only
-  const imageUrl = image?.url ?? null;
-  const hasAttachment = Boolean(imageUrl);
+  // save uploaded attachment
+  let imagePath = null;
+
+  if (image) {
+    // create attachments folder if it doesn't exist
+    if (!fs.existsSync(attachmentPath)) {
+      fs.mkdirSync(attachmentPath, { recursive: true });
+    }
+    // calculate the queued QOTD number
+    const qotdNumber = state.lastQuestionNumber + state.queue.length + 1;
+
+    // download attachment
+    const response = await fetch(image.url);
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    // preserve original extension
+    const ext = path.extname(image.name) || '.png';
+
+    // save as qotd-#number-attachment.ext
+    imagePath = path.join(
+      attachmentPath,
+      `qotd-${qotdNumber}-attachment${ext}`
+    );
+    // write file
+    fs.writeFileSync(imagePath, buffer);
+  }
+  const hasAttachment = Boolean(imagePath);
 
   //queue item
   const queueItem = {
@@ -125,7 +146,7 @@ export const execute = async (interaction) => {
     question,
     options,
     type: isPoll ? 'poll' : 'discussion',
-    image: imageUrl,
+    image: imagePath,
     queuedAt: Date.now(),
   };
 
@@ -178,7 +199,7 @@ export const execute = async (interaction) => {
       avatar: queueItem.avatar,
     },
     content: queueItem.question,
-    file: imageUrl,
+    file: imagePath,
     meta: {
       isPoll,
       options,

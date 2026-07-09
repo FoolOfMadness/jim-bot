@@ -1,8 +1,11 @@
 //events for on messageCreate
 import { Events, GuildMember } from 'discord.js';
 import { extremePunish } from '../commands/mod/punish.js';
-import { JIMPREG_IMAGE } from '#constants/assets';
-import { SCRAN_FORUM_CHANNEL_ID, CLIENT_ID } from '#constants/env';
+import {
+  SCRAN_FORUM_CHANNEL_ID,
+  CLIENT_ID,
+  TRIGGER_EMOJI_ID,
+} from '#constants/env';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 import {
   loadScranState,
@@ -55,13 +58,7 @@ export async function execute(message) {
 
     //jimpreg trigger
     if (/(?=.*jim)(?=.*preg)/is.test(message.content)) {
-      const reply = await message.reply({
-        files: [JIMPREG_IMAGE],
-      });
-      //delete 4s
-      setTimeout(() => {
-        reply.delete().catch(() => {});
-      }, 4000);
+      await message.react(TRIGGER_EMOJI_ID).catch(console.error);
       return;
     }
 

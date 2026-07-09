@@ -185,6 +185,29 @@ export function registerScranVote(state, threadId, messageId, voterId, value) {
   return true;
 }
 
+//remove a scran post
+export function unregisterScranPost(state, threadId, messageId) {
+  const userEntry = Object.values(state.users).find(
+    (user) => user.threadId === threadId
+  );
+  if (!userEntry) return false;
+
+  const post = userEntry.messages?.[messageId];
+
+  if (!post) return false;
+
+  //remove score from the total
+  userEntry.score -= post.score ?? 0;
+
+  //decrement count
+  userEntry.posts = Math.max(0, userEntry.posts - 1);
+
+  //remove post
+  delete userEntry.messages[messageId];
+
+  return userEntry.userId;
+}
+
 //leaderboard content
 export function buildScranLeaderboardMessage(state) {
   const users = Object.values(state.users);
@@ -250,4 +273,101 @@ export async function updateScranLeaderboard(client, state) {
   await message.edit({
     content: buildScranLeaderboardMessage(state),
   });
+}
+
+//rebuild scrans
+export async function rebuildScranState(client, state) {
+  let rebuilt = 0;
+
+  for (const [userId, user] of Object.entries(state.users)) {
+    let thread;
+
+    //check if thread deleted & remove
+    try {
+      thread = await client.channels.fetch(user.threadId);
+
+      if (!thread?.isThread()) {
+        delete state.users[userId];
+        continue;
+      }
+    } catch {
+      delete state.users[userId];
+      continue;
+    }
+    //reset stats
+    user.posts = 0;
+    user.score = 0;
+    user.messages = {};
+
+    const messages = await fetchAllMessages(thread);
+
+    for (const message of messages) {
+      //ignore profile post
+      if (message.id === user.profileMessageId) continue;
+
+      //only owner messages
+      if (message.author.id !== user.userId) continue;
+
+      //image only
+      const hasImage = [...message.attachments.values()].some((attachment) =>
+        attachment.contentType?.startsWith('image/')
+      );
+      if (!hasImage) continue;
+
+      user.posts++;
+
+      user.messages[message.id] = {
+        score: 0,
+        votes: {},
+      };
+
+      //rebuild votes
+      for (const reaction of message.reactions.cache.values()) {
+        let value;
+
+        if (reaction.emoji.name === '👍') {
+          value = 1;
+        } else if (reaction.emoji.name === '👎') {
+          value = -1;
+        } else {
+          continue;
+        }
+        const reactors = await reaction.users.fetch();
+
+        for (const reactor of reactors.values()) {
+          //ignore bot
+          if (reactor.bot) continue;
+
+          user.messages[message.id].votes[reactor.id] = value;
+          user.messages[message.id].score += value;
+          user.score += value;
+        }
+      }
+    }
+    await updateScranProfile(client, user.userId, state);
+    rebuilt++;
+  }
+  await updateScranLeaderboard(client, state);
+  return rebuilt;
+}
+//check all messages in thread
+export async function fetchAllMessages(channel) {
+  const messages = [];
+
+  let lastId;
+
+  while (true) {
+    const batch = await channel.messages.fetch({
+      limit: 100,
+      before: lastId,
+    });
+
+    if (!batch.size) break;
+
+    messages.push(...batch.values());
+
+    lastId = batch.last().id;
+  }
+  //oldest to newest
+  return messages.reverse();
 }

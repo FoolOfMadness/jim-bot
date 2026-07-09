@@ -304,7 +304,6 @@ export const execute = async (interaction) => {
     }
     return interaction.reply({
       content: 'Something went wrong while getting the weather...',
-      flags: EPHEMERAL_FLAG,
     });
   }
 };

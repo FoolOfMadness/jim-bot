@@ -1,13 +1,4 @@
 {
-  "leaderboardThreadId": "1524111111111111111",
-  "users": {
-    "123456789012345678": {
-      "userId": "123456789012345678",
-      "threadId": "123456789012345679",
-      "profileMessageId": "123456789012345680",
-      "score": 0,
-      "posts": 0,
-      "messages": {}
-    }
-  }
+  "users": {},
+  "posts": {}
 }

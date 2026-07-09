@@ -1,6 +1,7 @@
 //mod alerts utility
 import { EmbedBuilder } from 'discord.js';
 import { MOD_CHANNEL_ID } from '#constants/env';
+import path from 'path';
 
 async function getModChannel(client) {
   try {
@@ -19,11 +20,20 @@ export async function sendModAlert(client, payload) {
   const embed = buildEmbed(payload);
   if (!embed) return;
 
+  const messagePayload = {
+    embeds: [embed],
+  };
   if (payload.file) {
-    message.files = [payload.file];
-  }
+    const extension = path.extname(new URL(payload.file).pathname);
 
-  await modChannel.send({ embeds: [embed] });
+    messagePayload.files = [
+      {
+        attachment: payload.file,
+        name: `qotd-attachment${extension || ''}`,
+      },
+    ];
+  }
+  await modChannel.send(messagePayload);
 }
 
 //make the alert embed message

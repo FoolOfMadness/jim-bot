@@ -15,9 +15,9 @@ const statePath = path.join(__dirname, '../data/qotdState.json');
 
 //decide which image to use
 function resolveImage(image) {
-  if (!image) return QOTD_IMAGE;
-  if (typeof image === 'string') return image;
-  if (image?.url) return image.url;
+  if (image && fs.existsSync(image)) {
+    return image;
+  }
   return QOTD_IMAGE;
 }
 
@@ -49,11 +49,7 @@ export async function postNextQotd(client) {
         await oldThread.setArchived(true);
       }
     } catch (error) {
-      console.error(error);
-      await interaction.reply({
-        content: 'Something went wrong while archiving previous QotD...',
-        flags: EPHEMERAL_FLAG,
-      });
+      console.error('Failed to archive old QOTD thread:', error);
     }
   }
   //move next item
@@ -84,10 +80,16 @@ export async function postNextQotd(client) {
         `# Question of the Day #${qNum}\n\n` +
         `${next.question}\n\n` +
         `🪑 Submitted by: <@${next.userId}>`,
-      files: [image],
+      files: image
+        ? [
+            {
+              attachment: image,
+              name: path.basename(image),
+            },
+          ]
+        : [],
     },
   });
-
   //decide if poll
   if (answers.length >= 2) {
     await thread.send({
@@ -99,7 +101,16 @@ export async function postNextQotd(client) {
       },
     });
   }
-  //save
+  //delete the local image
+  if (next.image && next.image !== QOTD_IMAGE && fs.existsSync(next.image)) {
+    try {
+      fs.unlinkSync(next.image);
+      console.log(`🗑️ Deleted cached attachment: ${path.basename(next.image)}`);
+    } catch (err) {
+      console.error('Failed to delete cached QOTD attachment:', err);
+    }
+  }
+  //save updated state
   state.activeThreadId = thread.id;
   fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
   console.log(`Posted QOTD #${qNum}`);

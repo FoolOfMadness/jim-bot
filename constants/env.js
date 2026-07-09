@@ -64,4 +64,6 @@ export const MONTHLY_CRON_SCHEDULE = optionalEnv(
   '0 0 1 * *'
 );
 
+export const TRIGGER_EMOJI_ID = requiredEnv('TRIGGER_EMOJI_ID');
+
 export const DEBUG = requiredEnv('DEBUG');

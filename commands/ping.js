@@ -32,6 +32,5 @@ export const execute = async (interaction) => {
     content: `Roundtrip latency: ${
       sent.createdTimestamp - interaction.createdTimestamp
     }ms`,
-    flags: EPHEMERAL_FLAG,
   });
 };

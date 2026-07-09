@@ -12,6 +12,9 @@ export const data = new SlashCommandBuilder()
   .setDescription('Admin tools for Scran')
   .addSubcommand((sub) =>
     sub.setName('setup').setDescription('Create the Scran leaderboard')
+  )
+  .addSubcommand((sub) =>
+    sub.setName('rebuild').setDescription('Rebuild all Scran data')
   );
 
 //make a new leaderboard
@@ -47,6 +50,23 @@ export async function execute(interaction) {
     //confirm
     return interaction.editReply({
       content: `🏆 Scran leaderboard created!\n` + `<#${result.thread.id}>`,
+    });
+  }
+
+  //rebuild
+  if (sub === 'rebuild') {
+    await interaction.deferReply({
+      flags: EPHEMERAL_FLAG,
+    });
+
+    const state = loadScranState();
+
+    const rebuilt = await rebuildScranState(interaction.client, state);
+
+    saveScranState(state);
+
+    await interaction.editReply({
+      content: `🍔 Rebuilt ${rebuilt} Scran boards.`,
     });
   }
 }
