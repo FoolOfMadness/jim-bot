@@ -24,12 +24,12 @@ export async function sendModAlert(client, payload) {
     embeds: [embed],
   };
   if (payload.file) {
-    const extension = path.extname(new URL(payload.file).pathname);
+    const ext = path.extname(payload.file);
 
     messagePayload.files = [
       {
         attachment: payload.file,
-        name: `qotd-attachment${extension || ''}`,
+        name: `qotd-attachment${ext}`,
       },
     ];
   }

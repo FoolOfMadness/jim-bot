@@ -44,16 +44,20 @@ export async function execute(interaction) {
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({
-        content: 'There was an error while executing this command!',
-        flags: EPHEMERAL_FLAG,
-      });
-    } else {
-      await interaction.reply({
-        content: 'There was an error while executing this command!',
-        flags: EPHEMERAL_FLAG,
-      });
+
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.editReply({
+          content: '❌ There was an error while executing this command!',
+        });
+      } else {
+        await interaction.reply({
+          content: '❌ There was an error while executing this command!',
+          flags: EPHEMERAL_FLAG,
+        });
+      }
+    } catch (replyError) {
+      console.error('Failed to send error response:', replyError);
     }
   }
 }

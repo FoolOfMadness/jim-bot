@@ -85,8 +85,11 @@ async function getWeather(lat, lon, type = 'current') {
         'precipitation',
         'weather_code',
         'wind_speed_10m',
+        'pressure_msl',
+        'visibility',
       ].join(',')
     );
+    url.searchParams.set('daily', ['sunrise', 'sunset'].join(','));
   }
 
   const res = await fetch(url);
@@ -154,6 +157,95 @@ function formatForecastDate(dateString) {
   });
 }
 
+//time formatter
+function formatTime(dateString) {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+//air quality
+async function getAirQuality(lat, lon) {
+  const url = new URL('https://air-quality-api.open-meteo.com/v1/air-quality');
+
+  url.searchParams.set('latitude', lat);
+  url.searchParams.set('longitude', lon);
+  url.searchParams.set('timezone', 'auto');
+
+  url.searchParams.set(
+    'current',
+    [
+      'uv_index',
+      'grass_pollen',
+      'ragweed_pollen',
+      'mugwort_pollen',
+      'birch_pollen',
+      'alder_pollen',
+      'olive_pollen',
+    ].join(',')
+  );
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Air quality fetch failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+//convert pollen level to text
+function pollenLevel(value) {
+  if (value == null) return 'N/A';
+  if (value < 1) return 'None';
+  if (value < 10) return 'Low';
+  if (value < 50) return 'Moderate';
+  if (value < 100) return 'High';
+  return 'Very High';
+}
+
+//convert UV level to text
+function uvLevel(uv) {
+  if (uv == null) return 'N/A';
+  uv = Number(uv.toFixed(1));
+
+  if (uv < 3) return `🟢 Low (${uv})`;
+  if (uv < 6) return `🟡 Moderate (${uv})`;
+  if (uv < 8) return `🟠 High (${uv})`;
+  if (uv < 11) return `🔴 Very High (${uv})`;
+  return `🟣 Extreme (${uv})`;
+}
+
+//find the feel
+function feelsLikeEmoji(tempC) {
+  if (tempC <= -10) return '🧊';
+  if (tempC <= 0) return '🥶';
+  if (tempC <= 10) return '🧥';
+  if (tempC <= 20) return '😊';
+  if (tempC <= 25) return '😅';
+  if (tempC <= 35) return '🥵';
+  return '💀';
+}
+
+//moon phase
+function getMoonPhase(date = new Date()) {
+  const lp = 2551443;
+  const now = date.getTime() / 1000;
+
+  const newMoon = new Date('2000-01-06T18:14:00Z').getTime() / 1000;
+
+  const phase = ((((now - newMoon) % lp) + lp) % lp) / lp;
+
+  if (phase < 0.03 || phase > 0.97) return '🌑 New Moon';
+  if (phase < 0.22) return '🌒 Waxing Crescent';
+  if (phase < 0.28) return '🌓 First Quarter';
+  if (phase < 0.47) return '🌔 Waxing Gibbous';
+  if (phase < 0.53) return '🌕 Full Moon';
+  if (phase < 0.72) return '🌖 Waning Gibbous';
+  if (phase < 0.78) return '🌗 Last Quarter';
+  return '🌘 Waning Crescent';
+}
+
 //get the weather
 export const execute = async (interaction) => {
   try {
@@ -200,17 +292,36 @@ export const execute = async (interaction) => {
           : `Processing current weather for **${privateLocationText}**...`,
     });
 
-    //weather object
-    const weatherData = await getWeather(
-      geo.latitude,
-      geo.longitude,
-      forecastType
-    );
+    //weather objects
+    let weatherData;
+    let airData = null;
+
+    if (forecastType === 'current') {
+      [weatherData, airData] = await Promise.all([
+        getWeather(geo.latitude, geo.longitude, forecastType),
+        getAirQuality(geo.latitude, geo.longitude),
+      ]);
+    } else {
+      weatherData = await getWeather(geo.latitude, geo.longitude, forecastType);
+    }
 
     //current weather result
     if (forecastType === 'current') {
       const weather = weatherData.current;
+      const air = airData?.current ?? {};
 
+      //pollen combos
+      const treePollen = Math.max(
+        air.alder_pollen ?? 0,
+        air.birch_pollen ?? 0,
+        air.olive_pollen ?? 0
+      );
+      const weedPollen = Math.max(
+        air.ragweed_pollen ?? 0,
+        air.mugwort_pollen ?? 0
+      );
+
+      const moonPhase = getMoonPhase();
       const emoji = weatherCodeToEmoji(weather.weather_code);
       const condition = weatherCodeToText(weather.weather_code);
 
@@ -221,29 +332,77 @@ export const execute = async (interaction) => {
         .setDescription(`### Current weather for ${interaction.user}`)
         .addFields(
           {
-            name: 'Temperature',
+            name: '🌡 Temperature',
             value: `${convertFromCelsius(weather.temperature_2m).toFixed(1)}${unitSymbol}`,
             inline: true,
           },
           {
-            name: 'Feels Like',
+            name: `${feelsLikeEmoji(weather.apparent_temperature)} Feels Like`,
             value: `${convertFromCelsius(weather.apparent_temperature).toFixed(1)}${unitSymbol}`,
             inline: true,
           },
-          { name: 'Condition', value: condition, inline: true },
+          { name: '🌤️ Condition', value: condition, inline: true },
           {
-            name: 'Wind',
+            name: '💨 Wind',
             value: `${Math.round(weather.wind_speed_10m)} km/h`,
             inline: true,
           },
           {
-            name: 'Rain',
+            name: '🌧 Rain',
             value: `${weather.precipitation} mm`,
             inline: true,
           },
           {
-            name: 'Humidity',
+            name: '💦 Humidity',
             value: `${weather.relative_humidity_2m}%`,
+            inline: true,
+          },
+          {
+            name: '☀️ UV Index',
+            value: uvLevel(air.uv_index),
+            inline: true,
+          },
+          {
+            name: '📈 Pressure',
+            value: `${Math.round(weather.pressure_msl)} hPa`,
+            inline: true,
+          },
+          {
+            name: '👀 Visibility',
+            value:
+              weather.visibility != null
+                ? `${(weather.visibility / 1000).toFixed(1)} km`
+                : 'N/A',
+            inline: true,
+          },
+          {
+            name: '🌅 Sunrise',
+            value: formatTime(weatherData.daily?.sunrise?.[0]),
+            inline: true,
+          },
+          {
+            name: '🌇 Sunset',
+            value: formatTime(weatherData.daily?.sunset?.[0]),
+            inline: true,
+          },
+          {
+            name: '🌙 Moon Phase',
+            value: moonPhase,
+            inline: true,
+          },
+          {
+            name: '🌳 Tree Pollen',
+            value: pollenLevel(treePollen),
+            inline: true,
+          },
+          {
+            name: '🌾 Grass Pollen',
+            value: pollenLevel(air.grass_pollen),
+            inline: true,
+          },
+          {
+            name: '🌼 Weed Pollen',
+            value: pollenLevel(weedPollen),
             inline: true,
           }
         )
@@ -253,7 +412,6 @@ export const execute = async (interaction) => {
       await interaction.editReply({
         content: `Current weather for **${privateLocationText}** posted.`,
       });
-
       return interaction.followUp({ embeds: [embed] });
     }
 

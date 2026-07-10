@@ -59,6 +59,10 @@ export async function execute(interaction) {
       flags: EPHEMERAL_FLAG,
     });
   }
+  await interaction.deferReply({
+    content: 'Running...',
+    flags: EPHEMERAL_FLAG,
+  });
   const sub = interaction.options.getSubcommand();
 
   const type = interaction.options.getString('list');
@@ -66,9 +70,8 @@ export async function execute(interaction) {
 
   //config check
   if (!config) {
-    return interaction.reply({
+    return interaction.editReply({
       content: '❌ Invalid list.',
-      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -81,9 +84,8 @@ export async function execute(interaction) {
     const task = state.tasks.find((t) => t.id === id);
 
     if (!task) {
-      return interaction.reply({
+      return interaction.editReply({
         content: '❌ Not found.',
-        flags: EPHEMERAL_FLAG,
       });
     }
 
@@ -100,9 +102,8 @@ export async function execute(interaction) {
     //update completed log message
     await upsertCompletedLog(interaction.client, state, config, type);
 
-    return interaction.reply({
+    return interaction.editReply({
       content: `✅ Completed #${id}`,
-      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -115,9 +116,8 @@ export async function execute(interaction) {
     saveState(config.statePath, state);
     await upsertThread(interaction.client, state, config);
 
-    return interaction.reply({
+    return interaction.editReply({
       content: `🗑 Removed #${id}`,
-      flags: EPHEMERAL_FLAG,
     });
   }
 }
