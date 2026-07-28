@@ -2,6 +2,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 import { convertTemperature } from '#utils/convertTemperature';
+import { sendModAlert } from '#utils/modAlerts.js';
 import {
   weatherCodeToText,
   weatherCodeToEmoji,
@@ -199,6 +200,17 @@ export const execute = async (interaction) => {
     } else {
       weatherData = await getWeather(geo.latitude, geo.longitude, forecastType);
     }
+    //alert
+    await sendModAlert(interaction.client, {
+      type: 'weather.request',
+      user: interaction.user,
+      meta: {
+        input: location,
+        resolvedLocation: privateLocationText,
+        unit,
+        forecastType,
+      },
+    });
 
     //current weather result
     if (forecastType === 'current') {

@@ -13,6 +13,7 @@ import {
   registerScranPost,
   updateScranProfile,
 } from '#utils/scranUtils';
+import { handleWordleMessage } from '#games/wordleMessageHandler.js';
 
 /**
  * @typedef Message
@@ -33,6 +34,9 @@ export async function execute(message) {
     if (!message?.member) return;
 
     if (message.member.id === CLIENT_ID) return;
+
+    //wordle check
+    await handleWordleMessage(message).catch(console.error);
 
     //scran check
     if (message.channel.isThread()) {

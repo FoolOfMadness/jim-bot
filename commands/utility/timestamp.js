@@ -1,6 +1,7 @@
 //timestamp command
 import { SlashCommandBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { sendModAlert } from '#utils/modAlerts.js';
 import moment from 'moment-timezone';
 
 //timezone shortcut
@@ -185,7 +186,19 @@ export const execute = async (interaction) => {
 
     //public message
     const publicMessage = `Here's your timestamp, <@${interaction.user.id}>: <t:${timestamp}:${format}>`;
-
+    //alert
+    if (!defaultTimezone || !defaultDate || !defaultTime) {
+      await sendModAlert(interaction.client, {
+        type: 'timestamp.create',
+        user: interaction.user,
+        meta: {
+          timezone,
+          date,
+          time,
+          format,
+        },
+      });
+    }
     if (defaultTimezone && defaultDate && defaultTime) {
       //print timestamp if no changed variables
       await interaction.reply(publicMessage);

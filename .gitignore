@@ -79,6 +79,12 @@ qotdState.json
 #QOTD attachments
 assets/qotd-attachments/*
 
+#Wordles
+wordleState.json
+wordleStats.json
+wordleHistory.json
+words.txt
+
 #List State
 todoState.json
 mediaState.json
