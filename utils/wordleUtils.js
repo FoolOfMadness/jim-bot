@@ -31,7 +31,7 @@ export function loadWords(filePath) {
     .readFileSync(filePath, 'utf8')
     .split(/\r?\n/)
     .map((word) => word.trim().toUpperCase())
-    .filter(Boolean);
+    .filter((word) => /^[A-Z]+$/.test(word));
 }
 
 //get today's word
@@ -40,12 +40,10 @@ export function getDailyWord(words, wordNumber) {
 }
 
 //validate guess
-export function isValidGuess(word, wordList) {
-  return (
-    typeof word === 'string' &&
-    word.length === 5 &&
-    wordList.includes(word.toUpperCase())
-  );
+export function scoreGuess(guess, answer) {
+  guess = guess.toUpperCase();
+  answer = answer.toUpperCase();
+  guess.length === state.answer.length;
 }
 
 //check solved
@@ -58,19 +56,19 @@ export function scoreGuess(guess, answer) {
   guess = guess.toUpperCase();
   answer = answer.toUpperCase();
 
-  const result = Array(5).fill('⬛');
+  const wordLength = answer.length;
+  const result = Array(wordLength).fill('⬛');
   const remaining = [...answer];
 
   //greens
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < wordLength; i++) {
     if (guess[i] === answer[i]) {
       result[i] = '🟩';
       remaining[i] = null;
     }
   }
-
   //yellows
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < wordLength; i++) {
     if (result[i] === '🟩') continue;
     const index = remaining.indexOf(guess[i]);
 

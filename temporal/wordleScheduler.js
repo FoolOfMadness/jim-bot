@@ -65,6 +65,7 @@ export async function postDailyWordle(client) {
   state.wordNumber = (state.wordNumber ?? 0) + 1;
   const words = loadWords(wordsPath);
   state.answer = getDailyWord(words, state.wordNumber);
+  const wordLengthDisplay = '⬜'.repeat(state.answer.length);
 
   //reset players and results
   state.players = {};
@@ -84,10 +85,10 @@ export async function postDailyWordle(client) {
       content:
         `<@&${WORDLE_ROLE_ID}>\n\n` +
         `# 🟩 Daily Wordle #${state.wordNumber}\n\n` +
-        `Guess the 5 letter word!\n\n` +
+        `Today's word:\n${wordLengthDisplay}\n\n` +
+        `(${state.answer.length} letters)\n\n` +
         `You have 6 attempts.\n\n` +
         `Click below to start your private game.`,
-
       components: [button],
     },
   });

@@ -53,6 +53,7 @@ export async function handleWordleStart(interaction) {
   await playerThread.members.add(interaction.user.id);
 
   //start game message
+  const wordLengthDisplay = '⬜'.repeat(state.answer.length);
   await playerThread.send(
     [
       '# 🎮 Daily Wordle',
@@ -61,7 +62,9 @@ export async function handleWordleStart(interaction) {
       '',
       `Wordle #${state.wordNumber}`,
       '',
-      'Type a 5-letter word to guess.',
+      wordLengthDisplay,
+      '',
+      `(${state.answer.length} letters)`,
       '',
       'You have **6 attempts**.',
       '',
