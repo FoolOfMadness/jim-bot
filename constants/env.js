@@ -1,20 +1,22 @@
 //env path manager
 import 'dotenv/config';
 
+//required env variables
 function requiredEnv(name) {
   const value = process.env[name];
-
+  //if no value, complain
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
-
   return value;
 }
 
+//optional env variables
 function optionalEnv(name, fallback) {
   return process.env[name] || fallback;
 }
 
+//optional env array
 function optionalEnvArray(name) {
   return (
     process.env[name]
@@ -24,6 +26,7 @@ function optionalEnvArray(name) {
   );
 }
 
+//env variables
 export const TOKEN = requiredEnv('TOKEN');
 
 export const CLIENT_ID = requiredEnv('CLIENT_ID');
