@@ -3,7 +3,9 @@ import fs from 'fs';
 import { ChannelType, ThreadAutoArchiveDuration } from 'discord.js';
 import { loadWordleState, saveWordleState } from '#utils/wordleUtils';
 import { WORDLE_FORUM_CHANNEL_ID } from '#constants/env';
+import { EPHERMERAL_FLAG } from '#constants/env';
 
+//start button
 export async function handleWordleStart(interaction) {
   //ignore non-buttons
   if (!interaction.isButton()) return;
@@ -12,9 +14,7 @@ export async function handleWordleStart(interaction) {
   if (interaction.customId !== 'wordle_start') {
     return;
   }
-
   const state = loadWordleState();
-
   const userId = interaction.user.id;
 
   //check for active game today
@@ -25,15 +25,12 @@ export async function handleWordleStart(interaction) {
       const thread = await interaction.guild.channels.fetch(
         existingPlayer.threadId
       );
-
       return interaction.reply({
         content: `🎮 You already have an active Wordle:\n${thread}`,
-
-        ephemeral: true,
+        flags: EPHERMERAL_FLAG,
       });
     } catch {
-      //thread was deleted
-      //allow recreation
+      //thread already deleted
     }
   }
 
@@ -46,13 +43,9 @@ export async function handleWordleStart(interaction) {
       0,
       100
     ),
-
     type: ChannelType.PrivateThread,
-
     autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
-
     invitable: false,
-
     reason: `Wordle game for ${interaction.user.tag}`,
   });
 
@@ -80,30 +73,20 @@ export async function handleWordleStart(interaction) {
 
   //register player in state
   state.players ??= {};
-
   state.players[userId] = {
     username: interaction.user.username,
-
     wordNumber: state.wordNumber,
-
     threadId: playerThread.id,
-
     guesses: [],
-
     completed: false,
-
     failed: false,
-
     attempts: null,
-
     startedAt: Date.now(),
   };
-
   saveWordleState(state);
 
   await interaction.reply({
     content: `🎮 Your Wordle thread is ready:\n${playerThread}`,
-
-    ephemeral: true,
+    flags: EPHERMERAL_FLAG,
   });
 }

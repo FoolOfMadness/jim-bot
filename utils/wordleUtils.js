@@ -1,11 +1,10 @@
-// wordle utilities
+//wordle utility
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const statePath = path.join(__dirname, '../data/wordleState.json');
 
 //load wordle state
@@ -18,7 +17,6 @@ export function loadWordleState() {
       players: {},
     };
   }
-
   return JSON.parse(fs.readFileSync(statePath, 'utf8'));
 }
 
@@ -61,7 +59,6 @@ export function scoreGuess(guess, answer) {
   answer = answer.toUpperCase();
 
   const result = Array(5).fill('⬛');
-
   const remaining = [...answer];
 
   //greens
@@ -75,7 +72,6 @@ export function scoreGuess(guess, answer) {
   //yellows
   for (let i = 0; i < 5; i++) {
     if (result[i] === '🟩') continue;
-
     const index = remaining.indexOf(guess[i]);
 
     if (index !== -1) {
@@ -83,7 +79,6 @@ export function scoreGuess(guess, answer) {
       remaining[index] = null;
     }
   }
-
   return result;
 }
 
@@ -105,25 +100,19 @@ export function attemptsRemaining(guesses) {
 export function getResultMessage(guessCount) {
   switch (guessCount) {
     case 1:
-      return '🤯 Incredible! Solved in 1 guess!';
-
+      return '💢 Lucky guess...';
     case 2:
-      return '🔥 Amazing! Solved in 2 guesses!';
-
+      return '🔥 This level of reasoning is possible for the detective. What do you think everyone?';
     case 3:
-      return '🎉 Great job! Solved in 3 guesses!';
-
+      return '🎉 <Oh yeah! Very good!>';
     case 4:
-      return '✅ Solved in 4 guesses!';
-
+      return '✅ Solved in 4, average performance.';
     case 5:
-      return '✅ Solved in 5 guesses!';
-
+      return '✅ Solved in 5...you can do better.';
     case 6:
-      return '✅ Solved on the final attempt!';
-
+      return '✅ Barely made it. Used all 6 guesses.';
     default:
-      return '✅ Solved!';
+      return '❎❌ Loser!';
   }
 }
 
@@ -154,7 +143,7 @@ export function buildWordleResults(state) {
     '\n\n_Updated automatically by JimBot_'
   );
 
-  //history
+  //log history
   export function saveWordleHistory(state) {
     const historyPath = path.join(__dirname, '../data/wordleHistory.json');
 
@@ -163,37 +152,28 @@ export function buildWordleResults(state) {
     if (fs.existsSync(historyPath)) {
       history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
     }
-
     const results = state.results ?? [];
-
     const winners = results.filter((player) => player.won);
-
     const attempts = winners.map((player) => player.attempts);
 
     history[state.wordNumber] = {
       date: new Date().toISOString().split('T')[0],
-
       answer: state.answer,
-
       players: Object.keys(state.players ?? {}).length,
-
       winners: winners.length,
-
       averageGuesses: attempts.length
         ? Number(
             (attempts.reduce((a, b) => a + b, 0) / attempts.length).toFixed(2)
           )
         : null,
-
       bestResult: attempts.length ? Math.min(...attempts) : null,
-
       results: results.map((player) => ({
         username: player.username,
         attempts: player.attempts,
         won: player.won,
       })),
     };
-
+    //save history
     fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
   }
 }

@@ -1,4 +1,4 @@
-// wordle scheduler
+//wordle scheduler
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,31 +19,25 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const wordsPath = path.join(__dirname, '../data/words.txt');
 
 //create daily wordle
 export async function postDailyWordle(client) {
   console.log('🟩 Running Wordle scheduler');
-
   const state = loadWordleState();
 
   //close previous wordle
   if (state.activePostId) {
     try {
       const forum = await client.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
-
       const oldPost = await forum.threads.fetch(state.activePostId);
 
       if (oldPost) {
         //save previous wordle to history
         saveWordleHistory(state);
-
         //update previous post with results
         const results = buildWordleResults(state);
-
         const starter = await oldPost.fetchStarterMessage();
-
         await starter.edit({
           content: results,
           components: [],
@@ -60,30 +54,21 @@ export async function postDailyWordle(client) {
         }
         //lock & archive previous post
         await oldPost.setName(`🔒 Wordle #${state.wordNumber} Results`);
-
         await oldPost.setLocked(true);
-
         await oldPost.setArchived(true);
       }
     } catch (err) {
       console.error('Failed to close previous Wordle:', err);
     }
   }
-
   //create new wordle
-
   state.wordNumber = (state.wordNumber ?? 0) + 1;
-
   const words = loadWords(wordsPath);
-
   state.answer = getDailyWord(words, state.wordNumber);
 
   //reset players and results
-
   state.players = {};
-
   state.results = [];
-
   const forum = await client.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
 
   const button = new ActionRowBuilder().addComponents(
@@ -92,12 +77,9 @@ export async function postDailyWordle(client) {
       .setLabel('🎮 Start Wordle')
       .setStyle(ButtonStyle.Success)
   );
-
   const thread = await forum.threads.create({
     name: `Wordle #${state.wordNumber}`,
-
     appliedTags: [WORDLE_TAG_ID],
-
     message: {
       content:
         `<@&${WORDLE_ROLE_ID}>\n\n` +
@@ -109,12 +91,8 @@ export async function postDailyWordle(client) {
       components: [button],
     },
   });
-
   //save active post
-
   state.activePostId = thread.id;
-
   saveWordleState(state);
-
   console.log(`Posted Wordle #${state.wordNumber}`);
 }
