@@ -46,7 +46,7 @@ export const execute = async (interaction) => {
     const avatar = await loadImage(
       target.displayAvatarURL({
         extension: 'png',
-        size: GIF_CONFIG.avatarSize,
+        size: GIF_CONFIG.avatarLoadSize,
       })
     );
 
@@ -62,8 +62,8 @@ export const execute = async (interaction) => {
       avatar,
       0,
       0,
-      GIF_CONFIG.avatarSize,
-      GIF_CONFIG.avatarSize
+      GIF_CONFIG.avatarRenderSize,
+      GIF_CONFIG.avatarRenderSize
     );
 
     //use import values
@@ -96,8 +96,8 @@ export const execute = async (interaction) => {
           avatarCanvas.height,
           0,
           GIF_CONFIG.avatarOffsetY,
-          GIF_CONFIG.avatarSize,
-          GIF_CONFIG.avatarSize
+          GIF_CONFIG.avatarRenderSize,
+          GIF_CONFIG.avatarRenderSize
         );
       } else {
         context.drawImage(
@@ -108,8 +108,8 @@ export const execute = async (interaction) => {
           avatarCanvas.height,
           0,
           GIF_CONFIG.avatarOffsetY,
-          GIF_CONFIG.avatarSize,
-          GIF_CONFIG.avatarSize
+          GIF_CONFIG.avatarRenderSize,
+          GIF_CONFIG.avatarRenderSize
         );
       }
     };
