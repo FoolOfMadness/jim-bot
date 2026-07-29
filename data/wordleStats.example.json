@@ -1,10 +1,19 @@
 {
-  "user_ID": {
-    "username": "",
-    "wins": null,
-    "gamesPlayed": null,
-    "streak": null,
-    "best": null,
-    "totalGuesses": null
+  "1520523876990451735": {
+    "username": "Jim",
+
+    "gamesPlayed": 46,
+    "wins": 44,
+
+    "currentStreak": 12,
+    "bestStreak": 25,
+
+    "totalGuesses": 210,
+
+    "averageGuesses": 4.77,
+
+    "bestScore": 2,
+
+    "lastPlayed": 1782864700000
   }
 }

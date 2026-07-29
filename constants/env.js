@@ -51,6 +51,15 @@ export const QOTD_CRON_SCHEDULE = optionalEnv(
   '0 0 * * *'
 );
 
+export const WORDLE_FORUM_CHANNEL_ID = requiredEnv('WORDLE_FORUM_CHANNEL_ID');
+export const WORDLE_TAG_ID = requiredEnv('WORDLE_TAG_ID');
+export const WORDLE_ROLE_ID = requiredEnv('WORDLE_ROLE_ID');
+
+export const WORDLE_CRON_SCHEDULE = optionalEnv(
+  'WORDLE_CRON_SCHEDULE',
+  '0 0 * * *'
+);
+
 export const SCRAN_FORUM_CHANNEL_ID = requiredEnv('SCRAN_FORUM_CHANNEL_ID');
 export const SCRAN_TAG_ID = requiredEnv('SCRAN_TAG_ID');
 

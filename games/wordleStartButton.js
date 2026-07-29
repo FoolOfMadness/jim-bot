@@ -1,29 +1,23 @@
-//wordle start button
+//wordle start button handler
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import {
-  ChannelType,
-  PermissionFlagsBits,
-  ThreadAutoArchiveDuration,
-} from 'discord.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const statePath = path.join(__dirname, '../../data/wordleState.json');
+import { ChannelType, ThreadAutoArchiveDuration } from 'discord.js';
+import { loadWordleState, saveWordleState } from '#utils/wordleUtils';
+import { WORDLE_FORUM_CHANNEL_ID } from '#constants/env';
 
 export async function handleWordleStart(interaction) {
+  //ignore non-buttons
   if (!interaction.isButton()) return;
-  if (interaction.customId !== 'wordle_start') return;
 
-  const state = fs.existsSync(statePath)
-    ? JSON.parse(fs.readFileSync(statePath, 'utf8'))
-    : {};
+  //ignore other buttons
+  if (interaction.customId !== 'wordle_start') {
+    return;
+  }
+
+  const state = loadWordleState();
 
   const userId = interaction.user.id;
 
-  //player already has a game
+  //check for active game today
   const existingPlayer = state.players?.[userId];
 
   if (existingPlayer?.threadId && !existingPlayer.completed) {
@@ -33,26 +27,39 @@ export async function handleWordleStart(interaction) {
       );
 
       return interaction.reply({
-        content: `You already have an active game: ${thread}`,
+        content: `🎮 You already have an active Wordle:\n${thread}`,
+
         ephemeral: true,
       });
     } catch {
-      //thread deleted, continue
+      //thread was deleted
+      //allow recreation
     }
   }
 
-  const forumPost = interaction.channel;
+  //wordle forum channel
+  const forum = await interaction.guild.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
 
-  const playerThread = await forumPost.threads.create({
-    name: `wordle-${interaction.user.username}`.toLowerCase(),
-    autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+  //create private post
+  const playerThread = await forum.threads.create({
+    name: `🎮 ${interaction.user.username} - Wordle #${state.wordNumber}`.slice(
+      0,
+      100
+    ),
+
     type: ChannelType.PrivateThread,
+
+    autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+
     invitable: false,
+
     reason: `Wordle game for ${interaction.user.tag}`,
   });
 
+  //add player to post
   await playerThread.members.add(interaction.user.id);
 
+  //start game message
   await playerThread.send(
     [
       '# 🎮 Daily Wordle',
@@ -61,27 +68,42 @@ export async function handleWordleStart(interaction) {
       '',
       `Wordle #${state.wordNumber}`,
       '',
-      'Type a 5-letter word to make your first guess.',
+      'Type a 5-letter word to guess.',
       '',
       'You have **6 attempts**.',
+      '',
+      '🟩 Correct letter',
+      '🟨 Wrong position',
+      '⬛ Not in word',
     ].join('\n')
   );
 
+  //register player in state
   state.players ??= {};
 
   state.players[userId] = {
     username: interaction.user.username,
+
     wordNumber: state.wordNumber,
+
     threadId: playerThread.id,
+
     guesses: [],
+
     completed: false,
+
+    failed: false,
+
+    attempts: null,
+
     startedAt: Date.now(),
   };
 
-  fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+  saveWordleState(state);
 
   await interaction.reply({
-    content: `Your Wordle thread is ready: ${playerThread}`,
+    content: `🎮 Your Wordle thread is ready:\n${playerThread}`,
+
     ephemeral: true,
   });
 }
