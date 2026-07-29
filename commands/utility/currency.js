@@ -38,7 +38,7 @@ export const execute = async (interaction) => {
   });
 
   try {
-    //fetch api
+    //fetch api - UPDATE API ACCESS KEY NOW REQUIRED - FREE KEY ALLOWS 100 REQUESTS PER MONTH (https://exchangerate.host/)
     const response = await fetch(
       `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`
     );

@@ -112,10 +112,15 @@ export const execute = async (interaction) => {
     }
 
     //time up ping message
-    const timeout = setTimeout(() => {
-      interaction.followUp({
-        content: `⏰ <@${userId}> **${label}** timer is up!`,
-      });
+    const timeout = setTimeout(async () => {
+      try {
+        const channel = await interaction.client.channels.fetch(
+          interaction.channelId
+        );
+        await channel.send(`⏰ <@${userId}> **${label}** timer is up!`);
+      } catch (err) {
+        console.error(err);
+      }
       delete timers[label];
     }, ms);
 

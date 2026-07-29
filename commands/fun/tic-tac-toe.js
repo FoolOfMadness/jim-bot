@@ -62,7 +62,7 @@ const createBoardComponents = (board, gameOver = false) => {
       //buttons
       const button = new ButtonBuilder()
         .setCustomId(`ttt_${index}`)
-        .setLabel(cell ?? '')
+        .setLabel(cell ?? ' ')
         .setStyle(
           cell === 'X'
             ? ButtonStyle.Primary
@@ -190,11 +190,14 @@ export const execute = async (interaction) => {
         .setTitle('⭕ Tic-Tac-Toe ❌')
         .setDescription('The game timed out due to inactivity.');
 
-      await message.edit({
-        embeds: [timeoutEmbed],
-        components: createBoardComponents(board, true),
-      });
-
+      try {
+        await message.edit({
+          embeds: [timeoutEmbed],
+          components: createBoardComponents(board, true),
+        });
+      } catch (err) {
+        console.error(err);
+      }
       return;
     }
 
