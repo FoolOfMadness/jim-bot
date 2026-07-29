@@ -52,8 +52,8 @@ export const execute = async (interaction) => {
 
     //pre-render avatar once
     const avatarCanvas = createCanvas(
-      GIF_CONFIG.avatarSize,
-      GIF_CONFIG.avatarSize
+      GIF_CONFIG.avatarLoadSize,
+      GIF_CONFIG.avatarLoadSize
     );
 
     const avatarCtx = avatarCanvas.getContext('2d');
