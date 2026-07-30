@@ -1,20 +1,17 @@
 //wordle message handler
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import {
+  loadWordleState,
+  saveWordleState,
+  loadWords,
   scoreGuess,
   buildBoard,
-  isValidGuess,
   attemptsRemaining,
   getResultMessage,
-  loadWords,
+  isValidGuess,
+  loadWordleWords,
+  updateWordleLeaderboard,
+  updateWordleHistoryEntry,
 } from '#utils/wordleUtils';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const statePath = path.join(__dirname, '../../data/wordleState.json');
-const wordsPath = path.join(__dirname, '../../data/words.txt');
 
 //add completed game result
 function addWordleResult(state, player, userId) {
@@ -38,29 +35,36 @@ export async function handleWordleMessage(message) {
   //ignore bots
   if (message.author.bot) return;
 
-  //no state file
-  if (!fs.existsSync(statePath)) return;
-  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  //thread only
+  if (!message.channel.isThread()) return;
+
+  //load state
+  const state = loadWordleState();
 
   //find active game
   const player = state.players?.[message.author.id];
+
+  //if no player, ignore message
   if (!player) return;
 
   //ignore messages outside of the player's thread
-  if (message.channel.id !== player.threadId) {
-    return;
-  }
-  //ignore completed games
-  if (player.completed) {
-    return;
-  }
-  const guess = message.content.trim().toUpperCase();
-  const words = loadWords(wordsPath);
+  if (message.channel.id !== player.threadId) return;
 
-  //validate guess
+  //ignore completed games
+  if (player.completed) return;
+
+  const guess = message.content.trim().toUpperCase();
+  const words = loadWordleWords();
+
+  //validate
   if (!isValidGuess(guess, words)) {
-    return message.reply('❌ Please enter a valid 5-letter word.');
+    console.log('Rejected guess:', guess);
+
+    return message.reply(
+      `❌ Please enter a valid ${state.answer.length}-letter word.`
+    );
   }
+
   //save guess
   player.guesses.push(guess);
   const solved = guess === state.answer.toUpperCase();
@@ -74,7 +78,9 @@ export async function handleWordleMessage(message) {
     player.completedAt = Date.now();
 
     addWordleResult(state, player, message.author.id);
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+    saveWordleState(state);
+    await updateWordleLeaderboard(message.client, state);
+    updateWordleHistoryEntry(state);
 
     return message.reply(
       `${board}\n\n` + `${getResultMessage(player.guesses.length)}`
@@ -89,7 +95,9 @@ export async function handleWordleMessage(message) {
     player.completedAt = Date.now();
 
     addWordleResult(state, player, message.author.id);
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+    saveWordleState(state);
+    await updateWordleLeaderboard(message.client, state);
+    updateWordleHistoryEntry(state);
 
     return message.reply(
       `${board}\n\n` +
@@ -98,7 +106,7 @@ export async function handleWordleMessage(message) {
     );
   }
   //continue game
-  fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+  saveWordleState(state);
 
   return message.reply(
     `${board}\n\n` +

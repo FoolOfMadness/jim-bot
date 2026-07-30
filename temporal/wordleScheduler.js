@@ -33,10 +33,13 @@ export async function postDailyWordle(client) {
       const oldPost = await forum.threads.fetch(state.activePostId);
 
       if (oldPost) {
+        //build final results
+        const results = buildWordleResults(state);
+
         //save previous wordle to history
         saveWordleHistory(state);
+
         //update previous post with results
-        const results = buildWordleResults(state);
         const starter = await oldPost.fetchStarterMessage();
         await starter.edit({
           content: results,
@@ -67,9 +70,8 @@ export async function postDailyWordle(client) {
   state.answer = getDailyWord(words, state.wordNumber);
   const wordLengthDisplay = '⬜'.repeat(state.answer.length);
 
-  //reset players and results
+  //reset players
   state.players = {};
-  state.results = [];
   const forum = await client.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
 
   const button = new ActionRowBuilder().addComponents(
@@ -78,6 +80,7 @@ export async function postDailyWordle(client) {
       .setLabel('🎮 Start Wordle')
       .setStyle(ButtonStyle.Success)
   );
+
   const thread = await forum.threads.create({
     name: `Wordle #${state.wordNumber}`,
     appliedTags: [WORDLE_TAG_ID],

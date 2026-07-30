@@ -107,7 +107,7 @@ export const execute = async (interaction) => {
           avatarCanvas.width,
           avatarCanvas.height,
           0,
-          GIF_CONFIG.avatarOffsetY,
+          0,
           GIF_CONFIG.avatarRenderSize,
           GIF_CONFIG.avatarRenderSize
         );

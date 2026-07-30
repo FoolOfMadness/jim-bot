@@ -13,7 +13,7 @@ import {
   registerScranPost,
   updateScranProfile,
 } from '#utils/scranUtils';
-import { handleWordleMessage } from '#games/wordleMessageHandler.js';
+import { handleWordleMessage } from '#games/wordleMessageHandler';
 
 /**
  * @typedef Message
@@ -31,9 +31,11 @@ export const name = Events.MessageCreate;
 export async function execute(message) {
   try {
     //check if message, member, or bannedWords are invalid, or if the message is from JimBot
-    if (!message?.member) return;
+    if (!message?.author) return;
 
-    if (message.member.id === CLIENT_ID) return;
+    if (message.author.id === CLIENT_ID) return;
+
+    if (message.author.bot) return;
 
     //wordle check
     await handleWordleMessage(message).catch(console.error);
@@ -66,7 +68,7 @@ export async function execute(message) {
       return;
     }
 
-    if (activePunishments.has(message.member.id)) return;
+    if (activePunishments.has(message.author.id)) return;
 
     //60s
     const PUNISH_DURATION = 60 * 1000;
@@ -74,8 +76,9 @@ export async function execute(message) {
     for (const element of message.client.bannedWords) {
       const word = Object.values(element)[0];
       if (word.test(message.content)) {
+        if (!message.member) break;
         //mark user as being actively punished
-        activePunishments.add(message.member.id);
+        activePunishments.add(message.author.id);
         try {
           await extremePunish(
             message.channel,
@@ -85,7 +88,7 @@ export async function execute(message) {
           );
         } finally {
           //remove user from active punishments
-          activePunishments.delete(message.member.id);
+          activePunishments.delete(message.author.id);
         }
         break; //punish only once per message
       }

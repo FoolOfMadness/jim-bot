@@ -30,6 +30,7 @@
   "imports": {
     "#constants/*": "./constants/*.js",
     "#utils/*": "./utils/*.js",
-    "#temporal/*": "./temporal/*.js"
+    "#temporal/*": "./temporal/*.js",
+    "#games/*": "./games/*.js"
   }
 }

@@ -40,11 +40,9 @@ const checkWinner = (board) => {
       return board[a];
     }
   }
-
   if (board.every((cell) => cell !== null)) {
     return 'draw';
   }
-
   return null;
 };
 
@@ -62,7 +60,6 @@ const createBoardComponents = (board, gameOver = false) => {
       //buttons
       const button = new ButtonBuilder()
         .setCustomId(`ttt_${index}`)
-        .setLabel(cell ?? ' ')
         .setStyle(
           cell === 'X'
             ? ButtonStyle.Primary
@@ -72,12 +69,17 @@ const createBoardComponents = (board, gameOver = false) => {
         )
         .setDisabled(cell !== null || gameOver);
 
+      if (cell === 'X') {
+        button.setEmoji('❌');
+      } else if (cell === 'O') {
+        button.setEmoji('⭕');
+      } else {
+        button.setEmoji('⬜');
+      }
       actionRow.addComponents(button);
     }
-
     rows.push(actionRow);
   }
-
   return rows;
 };
 
@@ -90,7 +92,11 @@ const createGameEmbed = (
   result = null
 ) => {
   const boardDisplay = board
-    .map((cell) => cell ?? '⬜')
+    .map((cell) => {
+      if (cell === 'X') return '❌';
+      if (cell === 'O') return '⭕';
+      return '⬜';
+    })
     .reduce((rows, cell, index) => {
       if (index % 3 === 0) rows.push([]);
       rows[rows.length - 1].push(cell);
@@ -151,19 +157,19 @@ export const execute = async (interaction) => {
 
   //embed
   const embed = createGameEmbed(
-    playerX.username,
-    playerO.username,
-    currentPlayer.username,
+    playerX.toString(),
+    playerO.toString(),
+    currentPlayer.toString(),
     board
   );
 
   const components = createBoardComponents(board);
 
-  const message = await interaction.reply({
+  await interaction.reply({
     embeds: [embed],
     components,
-    fetchReply: true,
   });
+  const message = await interaction.fetchReply();
 
   //sets players as X or O
   const filter = (buttonInteraction) => {
@@ -193,7 +199,7 @@ export const execute = async (interaction) => {
       try {
         await message.edit({
           embeds: [timeoutEmbed],
-          components: createBoardComponents(board, true),
+          components: [],
         });
       } catch (err) {
         console.error(err);
@@ -204,10 +210,9 @@ export const execute = async (interaction) => {
     //stop other user's from taking a turn
     if (buttonInteraction.user.id !== currentPlayer.id) {
       await buttonInteraction.reply({
-        content: `It is not your turn. It is currently ${currentPlayer.username}'s turn.`,
+        content: `It is not your turn. It is currently ${currentPlayer.toString()}'s turn.`,
         flags: EPHEMERAL_FLAG,
       });
-
       continue;
     }
 
@@ -219,7 +224,6 @@ export const execute = async (interaction) => {
         content: 'That square has already been taken.',
         flags: EPHEMERAL_FLAG,
       });
-
       continue;
     }
 
@@ -233,18 +237,17 @@ export const execute = async (interaction) => {
       gameOver = true;
 
       const finalEmbed = createGameEmbed(
-        playerX.username,
-        playerO.username,
-        currentPlayer.username,
+        playerX.toString(),
+        playerO.toString(),
+        currentPlayer.toString(),
         board,
         result
       );
 
       await buttonInteraction.update({
         embeds: [finalEmbed],
-        components: createBoardComponents(board, true),
+        components: [],
       });
-
       return;
     }
 
@@ -258,9 +261,9 @@ export const execute = async (interaction) => {
 
     //update embed
     const updatedEmbed = createGameEmbed(
-      playerX.username,
-      playerO.username,
-      currentPlayer.username,
+      playerX.toString(),
+      playerO.toString(),
+      currentPlayer.toString(),
       board
     );
 

@@ -48,16 +48,15 @@ export const ANNOUNCEMENT_CHANNEL_IDS = optionalEnvArray(
 export const QOTD_FORUM_CHANNEL_ID = requiredEnv('QOTD_FORUM_CHANNEL_ID');
 export const QOTD_TAG_ID = requiredEnv('QOTD_TAG_ID');
 export const QOTD_ROLE_ID = requiredEnv('QOTD_ROLE_ID');
-
 export const QOTD_CRON_SCHEDULE = optionalEnv(
   'QOTD_CRON_SCHEDULE',
   '0 0 * * *'
 );
 
+export const WORDLE_GAME_CHANNEL_ID = requiredEnv('WORDLE_GAME_CHANNEL_ID');
 export const WORDLE_FORUM_CHANNEL_ID = requiredEnv('WORDLE_FORUM_CHANNEL_ID');
 export const WORDLE_TAG_ID = requiredEnv('WORDLE_TAG_ID');
 export const WORDLE_ROLE_ID = requiredEnv('WORDLE_ROLE_ID');
-
 export const WORDLE_CRON_SCHEDULE = optionalEnv(
   'WORDLE_CRON_SCHEDULE',
   '0 0 * * *'
@@ -70,7 +69,6 @@ export const TODO_FORUM_CHANNEL_ID = requiredEnv('TODO_FORUM_CHANNEL_ID');
 export const TODO_TAG_ID = requiredEnv('TODO_TAG_ID');
 
 export const MONTHLY_CHANNEL_ID = requiredEnv('MONTHLY_CHANNEL_ID');
-
 export const MONTHLY_CRON_SCHEDULE = optionalEnv(
   'MONTHLY_CRON_SCHEDULE',
   '0 0 1 * *'

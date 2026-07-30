@@ -1,11 +1,38 @@
-//interact with given command
 import { Events, Collection } from 'discord.js';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
+import { handleWordleStart } from '#games/wordleStartButton';
 
 export const name = Events.InteractionCreate;
+
 export async function execute(interaction) {
-  if (!interaction.isChatInputCommand() && !interaction.isContextMenuCommand())
+  //buttons
+  if (interaction.isButton()) {
+    try {
+      await handleWordleStart(interaction);
+    } catch (error) {
+      console.error('Button error:', error);
+
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply({
+          content: '❌ Button failed.',
+        });
+      } else {
+        await interaction.reply({
+          content: '❌ Button failed.',
+          flags: EPHEMERAL_FLAG,
+        });
+      }
+    }
     return;
+  }
+
+  //slash commands/context menus
+  if (
+    !interaction.isChatInputCommand() &&
+    !interaction.isContextMenuCommand()
+  ) {
+    return;
+  }
 
   const command = interaction.client.commands.get(interaction.commandName);
 
@@ -30,14 +57,17 @@ export async function execute(interaction) {
 
     if (now < expirationTime) {
       const expiredTimestamp = Math.round(expirationTime / 1000);
+
       return interaction.reply({
-        content: `Please wait, you are on cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+        content:
+          `Please wait, you are on cooldown for \`${command.data.name}\`. ` +
+          `You can use it again <t:${expiredTimestamp}:R>.`,
         flags: EPHEMERAL_FLAG,
       });
     }
   }
-
   timestamps.set(interaction.user.id, now);
+
   setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
   try {

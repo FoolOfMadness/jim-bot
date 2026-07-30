@@ -2,7 +2,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 import { convertTemperature } from '#utils/convertTemperature';
-import { sendModAlert } from '#utils/modAlerts.js';
+import { sendModAlert } from '#utils/modAlerts';
 import {
   weatherCodeToText,
   weatherCodeToEmoji,
