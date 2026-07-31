@@ -67,7 +67,8 @@ export async function postDailyWordle(client) {
   //create new wordle
   state.wordNumber = (state.wordNumber ?? 0) + 1;
   const words = loadWords(wordsPath);
-  state.answer = getDailyWord(words, state.wordNumber);
+  state.answer = getDailyWord(words, state.lastWord);
+  state.lastWord = state.answer;
   const wordLengthDisplay = '⬜'.repeat(state.answer.length);
 
   //reset players

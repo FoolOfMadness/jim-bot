@@ -15,6 +15,7 @@ export function loadWordleState() {
     return {
       wordNumber: 0,
       answer: null,
+      lastWord: null,
       activePostId: null,
       players: {},
     };
@@ -37,8 +38,13 @@ export function loadWords(filePath) {
 }
 
 //get today's word
-export function getDailyWord(words, wordNumber) {
-  return words[wordNumber % words.length];
+export function getDailyWord(words, lastWord = null) {
+  let selectedWord;
+  do {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    selectedWord = words[randomIndex];
+  } while (words.length > 1 && selectedWord === lastWord);
+  return selectedWord;
 }
 
 //load words
@@ -245,9 +251,9 @@ export function createPlayerState({
 
 //update leaderboard
 export async function updateWordleLeaderboard(client, state) {
-  const channel = await client.channels.fetch(WORDLE_GAME_CHANNEL_ID);
+  const thread = await client.channels.fetch(state.leaderboardThreadId);
 
-  const message = await channel.messages.fetch(WORDLE_LEADERBOARD_MESSAGE_ID);
+  const message = await thread.messages.fetch(state.leaderboardMessageId);
 
   await message.edit({
     content: buildWordleResults(state),
@@ -263,7 +269,6 @@ export function updateWordleHistoryEntry(state) {
   if (fs.existsSync(historyPath)) {
     history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
   }
-
   const results = Object.values(state.results ?? {});
 
   history[state.wordNumber] = {
@@ -276,6 +281,43 @@ export function updateWordleHistoryEntry(state) {
       : null,
     results,
   };
-
   fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
+}
+
+//daily status
+export function buildDailyWordleStatus(state) {
+  const players = Object.values(state.players ?? {});
+
+  const active = players.filter((p) => !p.completed);
+  const completed = players.filter((p) => p.completed && !p.failed);
+  const failed = players.filter((p) => p.completed && p.failed);
+
+  const wordLengthDisplay = '⬜'.repeat(state.answer.length);
+
+  return (
+    `# 🟩 Daily Wordle #${state.wordNumber}\n\n` +
+    `Today's word:\n${wordLengthDisplay}\n\n` +
+    `(${state.answer.length} letters)\n\n` +
+    `👥 Players Started: **${players.length}**\n` +
+    `🎮 Active: **${active.length}**\n` +
+    `✅ Completed: **${completed.length}**\n` +
+    `❌ Failed: **${failed.length}**\n\n` +
+    `Click below to start your private game.`
+  );
+}
+
+//update daily post
+export async function updateDailyWordlePost(client, state) {
+  if (!state.activePostId) return;
+
+  const forum = await client.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
+
+  const thread = await forum.threads.fetch(state.activePostId);
+
+  const starter = await thread.fetchStarterMessage();
+
+  await starter.edit({
+    content: buildDailyWordleStatus(state),
+    components: starter.components,
+  });
 }

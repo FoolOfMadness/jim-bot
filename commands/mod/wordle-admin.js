@@ -67,6 +67,7 @@ export async function execute(interaction) {
       content: [
         `🟩 Wordle #${state.wordNumber}`,
         `Answer: ||${state.answer}||`,
+        `Last Word: ||${state.lastWord ?? 'None'}||`,
         `Players: ${Object.keys(state.players ?? {}).length}`,
         `Completed: ${
           Object.values(state.players ?? {}).filter((p) => p.completed).length
@@ -97,6 +98,7 @@ export async function execute(interaction) {
     saveWordleState({
       wordNumber: 0,
       answer: null,
+      lastWord: null,
       activePostId: null,
       players: {},
       results: {},

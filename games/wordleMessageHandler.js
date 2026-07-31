@@ -79,6 +79,7 @@ export async function handleWordleMessage(message) {
 
     addWordleResult(state, player, message.author.id);
     saveWordleState(state);
+    await updateDailyWordlePost(message.client, state);
     await updateWordleLeaderboard(message.client, state);
     updateWordleHistoryEntry(state);
 
@@ -96,6 +97,7 @@ export async function handleWordleMessage(message) {
 
     addWordleResult(state, player, message.author.id);
     saveWordleState(state);
+    await updateDailyWordlePost(message.client, state);
     await updateWordleLeaderboard(message.client, state);
     updateWordleHistoryEntry(state);
 

@@ -109,6 +109,9 @@ export async function handleWordleStart(interaction) {
     });
     saveWordleState(state);
 
+    //update daily post
+    await updateDailyWordlePost(interaction.client, state);
+
     //confirm create
     await interaction.editReply({
       content: `🎮 Your Wordle thread is ready:\n${playerThread}`,
