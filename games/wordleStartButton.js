@@ -1,13 +1,18 @@
 //wordle start button handler
-import { ChannelType, ThreadAutoArchiveDuration } from 'discord.js';
+import {
+  ChannelType,
+  ThreadAutoArchiveDuration,
+  EmbedBuilder,
+} from 'discord.js';
 import {
   loadWordleState,
   saveWordleState,
   cleanDisplayName,
   createPlayerState,
   getWordDisplay,
+  updateDailyWordlePost,
 } from '#utils/wordleUtils';
-import { WORDLE_GAME_CHANNEL_ID } from '#constants/env';
+import { WORDLE_GAME_CHANNEL_ID, WORDLE_ROLE_ID } from '#constants/env';
 import { EPHEMERAL_FLAG } from '#constants/discordDefinitions';
 
 //start button
@@ -25,8 +30,19 @@ export async function handleWordleStart(interaction) {
       flags: EPHEMERAL_FLAG,
     });
     const state = loadWordleState();
+    if (!state.answer) {
+      return interaction.editReply({
+        content: '❌ There is no active Wordle right now.',
+      });
+    }
     const userId = interaction.user.id;
-
+    //check wordle role
+    if (!interaction.member.roles.cache.has(WORDLE_ROLE_ID)) {
+      return interaction.editReply({
+        content: '❌ You need the Wordle role to play Wordle.',
+        flags: EPHEMERAL_FLAG,
+      });
+    }
     //check for active game today
     const existingPlayer = state.players?.[userId];
 
@@ -74,29 +90,42 @@ export async function handleWordleStart(interaction) {
     });
 
     //add player to thread
-    await playerThread.members.add(interaction.user.id);
+    try {
+      await playerThread.members.add(interaction.user.id);
+    } catch (err) {
+      console.error('Failed adding player to Wordle thread:', err);
+
+      return interaction.editReply({
+        content:
+          '❌ I could not add you to your Wordle thread. Please make sure you have the Wordle role.',
+        flags: EPHEMERAL_FLAG,
+      });
+    }
 
     //start game message
     const wordLengthDisplay = getWordDisplay(state.answer);
-    const gameMessage = await playerThread.send(
-      [
-        '# 🎮 Daily Wordle',
-        '',
-        `Welcome <@${interaction.user.id}>!`,
-        '',
-        `Wordle #${state.wordNumber}`,
-        '',
-        wordLengthDisplay,
-        '',
-        `(${state.answer.length} letters)`,
-        '',
-        'You have **6 attempts**.',
-        '',
-        '🟩 Correct letter',
-        '🟨 Wrong position',
-        '⬛ Not in word',
-      ].join('\n')
-    );
+    const gameEmbed = new EmbedBuilder()
+      .setTitle(`🎮 Daily Wordle #${state.wordNumber}`)
+      .setDescription(
+        [
+          `Welcome <@${interaction.user.id}>!`,
+          '',
+          `\`${wordLengthDisplay}\``,
+          '',
+          `**${state.answer.length} letters**`,
+          '',
+          'You have **6 attempts**.',
+          '',
+          '🟩 Correct letter',
+          '🟨 Wrong position',
+          '⬛ Not in word',
+        ].join('\n')
+      )
+      .setColor('Green');
+
+    const gameMessage = await playerThread.send({
+      embeds: [gameEmbed],
+    });
 
     //register player in state
     state.players ??= {};

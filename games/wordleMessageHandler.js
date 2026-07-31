@@ -2,8 +2,6 @@
 import {
   loadWordleState,
   saveWordleState,
-  loadWords,
-  scoreGuess,
   buildBoard,
   attemptsRemaining,
   getResultMessage,
@@ -11,7 +9,9 @@ import {
   loadWordleWords,
   updateWordleLeaderboard,
   updateWordleHistoryEntry,
+  updateDailyWordlePost,
 } from '#utils/wordleUtils';
+import { EmbedBuilder } from 'discord.js';
 
 //add completed game result
 function addWordleResult(state, player, userId) {
@@ -47,6 +47,9 @@ export async function handleWordleMessage(message) {
   //if no player, ignore message
   if (!player) return;
 
+  //get embed
+  const gameMessage = await message.channel.messages.fetch(player.messageId);
+
   //ignore messages outside of the player's thread
   if (message.channel.id !== player.threadId) return;
 
@@ -57,12 +60,26 @@ export async function handleWordleMessage(message) {
   const words = loadWordleWords();
 
   //validate
-  if (!isValidGuess(guess, words)) {
-    console.log('Rejected guess:', guess);
+  if (!isValidGuess(guess, state.answer, words)) {
+    const board = buildBoard(player.guesses, state.answer);
 
-    return message.reply(
-      `❌ Please enter a valid ${state.answer.length}-letter word.`
-    );
+    await gameMessage.edit({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`🎮 Daily Wordle #${state.wordNumber}`)
+          .setDescription(
+            [
+              board || '⬜⬜⬜⬜⬜',
+              '',
+              `❌ **${guess} is not a valid word.**`,
+              '',
+              `Attempts Remaining: **${attemptsRemaining(player.guesses)}**`,
+            ].join('\n')
+          )
+          .setColor('Red'),
+      ],
+    });
+    return;
   }
 
   //save guess
@@ -78,14 +95,26 @@ export async function handleWordleMessage(message) {
     player.completedAt = Date.now();
 
     addWordleResult(state, player, message.author.id);
+
     saveWordleState(state);
-    await updateDailyWordlePost(message.client, state);
-    await updateWordleLeaderboard(message.client, state);
+
     updateWordleHistoryEntry(state);
 
-    return message.reply(
-      `${board}\n\n` + `${getResultMessage(player.guesses.length)}`
-    );
+    await updateDailyWordlePost(message.client, state);
+    await updateWordleLeaderboard(message.client, state);
+
+    await gameMessage.edit({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`🎉 Wordle #${state.wordNumber} Complete`)
+          .setDescription(
+            `${board}\n\n${getResultMessage(player.guesses.length)}`
+          )
+          .setColor('Gold'),
+      ],
+    });
+    await deleteGuessMessage(message);
+    return;
   }
 
   //player lose
@@ -96,22 +125,50 @@ export async function handleWordleMessage(message) {
     player.completedAt = Date.now();
 
     addWordleResult(state, player, message.author.id);
+
     saveWordleState(state);
-    await updateDailyWordlePost(message.client, state);
-    await updateWordleLeaderboard(message.client, state);
+
     updateWordleHistoryEntry(state);
 
-    return message.reply(
-      `${board}\n\n` +
-        `❌ You ran out of guesses.\n` +
-        `The answer was **${state.answer}**.`
-    );
+    await updateDailyWordlePost(message.client, state);
+    await updateWordleLeaderboard(message.client, state);
+
+    await gameMessage.edit({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`❌ Wordle #${state.wordNumber} Failed`)
+          .setDescription(`${board}\n\nThe answer was **${state.answer}**.`)
+          .setColor('Red'),
+      ],
+    });
+    await deleteGuessMessage(message);
+    return;
   }
+
   //continue game
   saveWordleState(state);
 
-  return message.reply(
-    `${board}\n\n` +
-      `Attempts Remaining: **${attemptsRemaining(player.guesses)}**`
-  );
+  await gameMessage.edit({
+    embeds: [
+      new EmbedBuilder()
+        .setTitle(`🎮 Daily Wordle #${state.wordNumber}`)
+        .setDescription(
+          `${board}\n\n` +
+            `Attempts Remaining: **${attemptsRemaining(player.guesses)}**`
+        )
+        .setColor('Green'),
+    ],
+  });
+  await deleteGuessMessage(message);
+}
+
+//delete guess
+async function deleteGuessMessage(message) {
+  try {
+    await message.delete();
+  } catch (err) {
+    if (err.code !== 10008) {
+      console.error('Failed deleting guess:', err);
+    }
+  }
 }

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { WORDLE_FORUM_CHANNEL_ID, WORDLE_TAG_ID } from '#constants/env';
+import { EmbedBuilder } from 'discord.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,9 @@ export function loadWords(filePath) {
     .readFileSync(filePath, 'utf8')
     .split(/\r?\n/)
     .map((word) => word.trim().toUpperCase())
-    .filter((word) => /^[A-Z]+$/.test(word));
+    .filter(
+      (word) => /^[A-Z]+$/.test(word) && word.length >= 3 && word.length <= 8
+    );
 }
 
 //get today's word
@@ -70,12 +73,10 @@ export function getWordDisplay(answer) {
 }
 
 //validate guess
-export function isValidGuess(word, wordList) {
-  if (typeof word !== 'string') return false;
-
+export function isValidGuess(word, answer, wordList) {
   const guess = word.trim().toUpperCase();
 
-  return wordList.includes(guess);
+  return guess.length === answer.length && wordList.includes(guess);
 }
 
 //score guess
@@ -137,12 +138,12 @@ export function getResultMessage(guessCount) {
     case 6:
       return '✅ Barely made it. Used all 6 guesses.';
     default:
-      return '❎❌ Loser!';
+      return '❎ Loser!';
   }
 }
 
 //build daily leaderboard
-export function buildWordleResults(state) {
+export function buildFinalWordleResults(state) {
   const players = Object.values(state.players ?? {});
 
   const completed = players
@@ -157,9 +158,9 @@ export function buildWordleResults(state) {
   }
 
   const results = completed.map((player, index) => {
-    return (
-      `${index + 1}. ` + `${player.username} - ` + `${player.attempts} guesses`
-    );
+    return `${index + 1}. <@${player.userId}> - ${
+      player.failed ? '❌ Failed' : `${player.attempts} guesses`
+    }`;
   });
 
   return (
@@ -169,38 +170,33 @@ export function buildWordleResults(state) {
   );
 }
 
-//log history
-export function saveWordleHistory(state) {
-  const historyPath = path.join(__dirname, '../data/wordleHistory.json');
+//daily leaderboard
+export function buildDailyWordleLeaderboard(state) {
+  const players = Object.values(state.players ?? {});
 
-  let history = {};
+  const completed = players
+    .filter((player) => player.completed)
+    .sort((a, b) => {
+      if (a.failed && !b.failed) return 1;
+      if (!a.failed && b.failed) return -1;
 
-  if (fs.existsSync(historyPath)) {
-    history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-  }
-  const results = state.results ?? [];
-  const winners = results.filter((player) => player.won);
-  const attempts = winners.map((player) => player.attempts);
+      return a.attempts - b.attempts;
+    });
 
-  history[state.wordNumber] = {
-    date: new Date().toISOString().split('T')[0],
-    answer: state.answer,
-    players: Object.keys(state.players ?? {}).length,
-    winners: winners.length,
-    averageGuesses: attempts.length
-      ? Number(
-          (attempts.reduce((a, b) => a + b, 0) / attempts.length).toFixed(2)
-        )
-      : null,
-    bestResult: attempts.length ? Math.min(...attempts) : null,
-    results: results.map((player) => ({
-      username: player.displayName ?? player.username,
-      attempts: player.attempts,
-      won: player.won,
-    })),
-  };
-  //save history
-  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
+  const results = completed.map((player, index) => {
+    const result = player.failed ? '❌ Failed' : `🟩 ${player.attempts}`;
+
+    return `${index + 1}. <@${player.userId ?? player.id}> - ${result}`;
+  });
+
+  return (
+    `# 🟩 Daily Wordle #${state.wordNumber}\n\n` +
+    `Today's word:\n${'⬜'.repeat(state.answer.length)}\n\n` +
+    `(${state.answer.length} letters)\n\n` +
+    `🏆 Today's Results\n\n` +
+    (results.length ? results.join('\n') : 'No completed games yet.') +
+    '\n\nClick below to start your private game.'
+  );
 }
 
 //create wordle leaderboard
@@ -236,6 +232,7 @@ export function createPlayerState({
   wordNumber,
 }) {
   return {
+    userId: interaction.user.id,
     username: interaction.user.username,
     displayName,
     threadId,
@@ -251,13 +248,31 @@ export function createPlayerState({
 
 //update leaderboard
 export async function updateWordleLeaderboard(client, state) {
-  const thread = await client.channels.fetch(state.leaderboardThreadId);
+  if (!state.leaderboardThreadId || !state.leaderboardMessageId) {
+    console.log('Wordle leaderboard not configured. Skipping update.');
+    return;
+  }
+  try {
+    const thread = await client.channels.fetch(state.leaderboardThreadId);
+    const message = await thread.messages.fetch(state.leaderboardMessageId);
 
-  const message = await thread.messages.fetch(state.leaderboardMessageId);
+    const historyPath = path.join(__dirname, '../data/wordleHistory.json');
 
-  await message.edit({
-    content: buildWordleResults(state),
-  });
+    const history = fs.existsSync(historyPath)
+      ? JSON.parse(fs.readFileSync(historyPath, 'utf8'))
+      : {};
+
+    await message.edit({
+      content: buildWordleLeaderboard(history),
+    });
+  } catch (err) {
+    console.error('Wordle leaderboard update failed:', err.message);
+
+    //clear invalid references
+    state.leaderboardThreadId = null;
+    state.leaderboardMessageId = null;
+    saveWordleState(state);
+  }
 }
 
 //update history
@@ -269,41 +284,34 @@ export function updateWordleHistoryEntry(state) {
   if (fs.existsSync(historyPath)) {
     history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
   }
+
   const results = Object.values(state.results ?? {});
 
-  history[state.wordNumber] = {
+  history[state.wordNumber] ??= {
     date: new Date().toISOString().split('T')[0],
     answer: state.answer,
-    players: Object.keys(state.players ?? {}).length,
-    winners: results.filter((p) => p.won).length,
-    bestResult: results.length
-      ? Math.min(...results.map((p) => p.attempts))
-      : null,
-    results,
+    players: 0,
+    winners: 0,
+    bestResult: null,
+    results: [],
   };
+
+  history[state.wordNumber].results = results.map((player) => ({
+    userId: player.userId,
+    username: player.username,
+    attempts: player.attempts,
+    won: player.won,
+  }));
+
+  history[state.wordNumber].players = Object.keys(state.players ?? {}).length;
+
+  history[state.wordNumber].winners = results.filter((p) => p.won).length;
+
+  history[state.wordNumber].bestResult = results.length
+    ? Math.min(...results.map((p) => p.attempts))
+    : null;
+
   fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
-}
-
-//daily status
-export function buildDailyWordleStatus(state) {
-  const players = Object.values(state.players ?? {});
-
-  const active = players.filter((p) => !p.completed);
-  const completed = players.filter((p) => p.completed && !p.failed);
-  const failed = players.filter((p) => p.completed && p.failed);
-
-  const wordLengthDisplay = '⬜'.repeat(state.answer.length);
-
-  return (
-    `# 🟩 Daily Wordle #${state.wordNumber}\n\n` +
-    `Today's word:\n${wordLengthDisplay}\n\n` +
-    `(${state.answer.length} letters)\n\n` +
-    `👥 Players Started: **${players.length}**\n` +
-    `🎮 Active: **${active.length}**\n` +
-    `✅ Completed: **${completed.length}**\n` +
-    `❌ Failed: **${failed.length}**\n\n` +
-    `Click below to start your private game.`
-  );
 }
 
 //update daily post
@@ -317,7 +325,94 @@ export async function updateDailyWordlePost(client, state) {
   const starter = await thread.fetchStarterMessage();
 
   await starter.edit({
-    content: buildDailyWordleStatus(state),
+    content: buildDailyWordleLeaderboard(state),
     components: starter.components,
   });
+}
+
+//global leaderboard
+export function buildWordleLeaderboard(history) {
+  const players = {};
+
+  Object.values(history).forEach((day) => {
+    for (const result of day.results ?? []) {
+      if (!players[result.userId]) {
+        players[result.userId] = {
+          userId: result.userId,
+          completed: 0,
+          failed: 0,
+          guesses: [],
+        };
+      }
+
+      if (result.won) {
+        players[result.userId].completed++;
+        players[result.userId].guesses.push(result.attempts);
+      } else {
+        players[result.userId].failed++;
+      }
+    }
+  });
+
+  const leaderboard = Object.values(players)
+    .map((player) => ({
+      ...player,
+      games: player.completed + player.failed,
+      successRate:
+        (player.completed / (player.completed + player.failed)) * 100,
+      average: player.guesses.length
+        ? player.guesses.reduce((a, b) => a + b, 0) / player.guesses.length
+        : 6,
+      best: player.guesses.length ? Math.min(...player.guesses) : 6,
+    }))
+    .sort((a, b) => {
+      //wins
+      if (b.completed !== a.completed) return b.completed - a.completed;
+
+      //success rate
+      if (b.successRate !== a.successRate) return b.successRate - a.successRate;
+
+      //average
+      if (a.average !== b.average) return a.average - b.average;
+
+      //best game
+      return a.best - b.best;
+    });
+
+  if (!leaderboard.length) {
+    return '# 🏆 Wordle Leaderboard\n\nNo completed games yet.';
+  }
+
+  const results = leaderboard.map((player, index) => {
+    return (
+      `${index + 1}. <@${player.userId}> - ` +
+      `${player.completed}W-${player.failed}L ` +
+      `(${player.games} games) | ` +
+      `${player.successRate.toFixed(1)}% success | ` +
+      `Avg: ${player.average.toFixed(2)} | ` +
+      `Best: ${player.best}`
+    );
+  });
+
+  return (
+    '# 🏆 Wordle Leaderboard\n\n' +
+    results.join('\n') +
+    '\n\n_Updated automatically by JimBot 🟩_'
+  );
+}
+
+//embed game
+export function buildWordleEmbed(state, player) {
+  const board = buildBoard(player.guesses, state.answer);
+
+  return new EmbedBuilder()
+    .setTitle(`🎮 Daily Wordle #${state.wordNumber}`)
+    .setDescription(
+      [
+        `\`${board || '⬜'.repeat(state.answer.length)}\``,
+        '',
+        `Attempts Remaining: **${attemptsRemaining(player.guesses)}**`,
+      ].join('\n')
+    )
+    .setColor(player.completed ? 'Gold' : 'Green');
 }

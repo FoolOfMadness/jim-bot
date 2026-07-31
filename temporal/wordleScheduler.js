@@ -11,10 +11,11 @@ import {
 import {
   loadWordleState,
   saveWordleState,
-  saveWordleHistory,
+  updateWordleHistoryEntry,
   getDailyWord,
   loadWords,
-  buildWordleResults,
+  buildFinalWordleResults,
+  buildDailyWordleLeaderboard,
 } from '#utils/wordleUtils';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,10 +35,10 @@ export async function postDailyWordle(client) {
 
       if (oldPost) {
         //build final results
-        const results = buildWordleResults(state);
+        const results = buildFinalWordleResults(state);
 
         //save previous wordle to history
-        saveWordleHistory(state);
+        updateWordleHistoryEntry(state);
 
         //update previous post with results
         const starter = await oldPost.fetchStarterMessage();
@@ -67,12 +68,14 @@ export async function postDailyWordle(client) {
   //create new wordle
   state.wordNumber = (state.wordNumber ?? 0) + 1;
   const words = loadWords(wordsPath);
+
   state.answer = getDailyWord(words, state.lastWord);
   state.lastWord = state.answer;
   const wordLengthDisplay = '⬜'.repeat(state.answer.length);
 
-  //reset players
+  //reset players & results
   state.players = {};
+  state.results = {};
   const forum = await client.channels.fetch(WORDLE_FORUM_CHANNEL_ID);
 
   const button = new ActionRowBuilder().addComponents(
@@ -86,13 +89,7 @@ export async function postDailyWordle(client) {
     name: `Wordle #${state.wordNumber}`,
     appliedTags: [WORDLE_TAG_ID],
     message: {
-      content:
-        `<@&${WORDLE_ROLE_ID}>\n\n` +
-        `# 🟩 Daily Wordle #${state.wordNumber}\n\n` +
-        `Today's word:\n${wordLengthDisplay}\n\n` +
-        `(${state.answer.length} letters)\n\n` +
-        `You have 6 attempts.\n\n` +
-        `Click below to start your private game.`,
+      content: `<@&${WORDLE_ROLE_ID}>\n\n` + buildDailyWordleLeaderboard(state),
       components: [button],
     },
   });

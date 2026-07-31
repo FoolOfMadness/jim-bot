@@ -8,8 +8,8 @@ import { postDailyWordle } from '#temporal/wordleScheduler';
 import {
   loadWordleState,
   saveWordleState,
-  buildWordleResults,
-  saveWordleHistory,
+  buildFinalWordleResults,
+  updateWordleHistoryEntry,
   createWordleLeaderboard,
 } from '#utils/wordleUtils';
 
@@ -53,11 +53,13 @@ export async function execute(interaction) {
 
   //force post
   if (sub === 'post') {
+    await interaction.deferReply({
+      flags: EPHEMERAL_FLAG,
+    });
     await postDailyWordle(interaction.client);
 
-    return interaction.reply({
+    return interaction.editReply({
       content: '🚀 Forced Wordle post.',
-      flags: EPHEMERAL_FLAG,
     });
   }
 
@@ -85,10 +87,10 @@ export async function execute(interaction) {
         flags: EPHEMERAL_FLAG,
       });
     }
-    saveWordleHistory(state);
+    updateWordleHistoryEntry(state);
 
     return interaction.reply({
-      content: buildWordleResults(state),
+      content: buildFinalWordleResults(state),
       flags: EPHEMERAL_FLAG,
     });
   }
@@ -111,10 +113,13 @@ export async function execute(interaction) {
 
   //create leaderboard
   if (sub === 'create-leaderboard') {
+    await interaction.deferReply({
+      flags: EPHEMERAL_FLAG,
+    });
+
     if (state.leaderboardThreadId) {
-      return interaction.reply({
+      return interaction.editReply({
         content: '❌ Wordle leaderboard already exists.',
-        flags: EPHEMERAL_FLAG,
       });
     }
     const result = await createWordleLeaderboard(interaction.client);
@@ -124,9 +129,8 @@ export async function execute(interaction) {
 
     saveWordleState(state);
 
-    return interaction.reply({
+    return interaction.editReply({
       content: `🏆 Wordle leaderboard created:\n${result.thread}`,
-      flags: EPHEMERAL_FLAG,
     });
   }
 }
